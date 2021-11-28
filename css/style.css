@@ -1,0 +1,259 @@
+th, td {
+  vertical-align: middle !important;
+  text-shadow: 1px 2px #3c3c3e;
+  padding: 12px 4px !important;
+  text-align: center;
+}
+.icn-spinner {
+  animation: spin-animation 0.5s infinite;
+  display: inline-block;
+}
+
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.b-warning, .b-danger, .b-success {
+  padding: 5px;
+  border-radius: 10px;
+  box-shadow: 1px 1px 8px 1px #3c3c3e;
+}
+
+.b-warning {
+  border: 1px solid #ffc107!important;
+}
+
+.b-danger {
+  border: 1px solid #dc3545!important;
+}
+
+.b-success {
+  border: 1px solid #28a745!important;
+}
+
+.b-invalid {
+  border-color: #dc3545!important;
+}
+
+.fink {
+  color: #fff;
+  text-shadow: 1px 2px #3c3c3e;
+}
+
+.chartCont {
+  width: 200px;
+  position: relative;
+  margin: auto;
+}
+
+.chartLabel {
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  font-size: 24px;
+  line-height: .8;
+  text-align: center;
+}
+
+.chartLabel #chartTotalSLP,
+.chartLabel small {
+  position: relative;
+  left: -50%;
+  color: #fff;
+}
+
+.sum-box-l {
+  padding: 0.25rem 0.25rem 0.25rem 0;
+  margin-bottom: 0.25rem;
+}
+
+.sum-box-r {
+  padding: 0.25rem 0 0.25rem 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.chartOverviewCont,
+.overviewCont {
+  background: #575c62;
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: 1px 2px 8px 1px #575c628f;
+}
+
+.chartOverviewCont {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.overviewCont {
+  padding: 10px 0;
+  color: #fff;
+  padding: 8px;
+}
+
+.overviewCont span {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 1px 2px #3c3c3e;
+}
+
+.overviewCont small {
+  text-shadow: 1px 2px #3c3c3e;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #3673b4;
+  border-color: #3673b4;
+}
+
+.scholarChart .row {
+  border: 1px solid #888;
+  margin: 0;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 1px 1px 8px 1px #3c3c3e;
+}
+
+.scholarChart .row small {
+  display: block;
+  line-height: 1;
+  color: #fff;
+}
+
+.scholarChart .row span.col {
+  margin: auto;
+}
+
+.scholarChart #totalSlp {
+  color: #fff;
+}
+
+.rfix {
+  margin-right: 0;
+}
+
+.labelCh {
+  text-align: left;
+  display: block;
+  color: #fff;
+  text-shadow: 1px 2px #3c3c3e;
+}
+
+#schoCount,
+#totalSlp {
+  text-shadow: 1px 2px #3c3c3e;
+}
+
+.active {
+  background-color: #3673b4 !important;
+  border-color: #3673b4 !important;
+}
+
+.ovIcon {
+  margin: auto;
+  text-align: right;
+}
+
+.ovIcon img {
+  width: 100%;
+}
+
+.table-dark {
+  background: #575c62;
+  border-radius: 10px;
+  box-shadow: 1px 2px 8px 1px #575c628f;
+}
+
+.schoNext,
+.schoAVG,
+.schoToday,
+.schoLast,
+.schoNext,
+.schoUnclaim,
+.schoRonin,
+.schoSLP,
+.schoManager,
+.schoTotal {
+  line-height: 1.1;
+  text-align: center;
+}
+
+#loading {
+    position: fixed;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    opacity: 1;
+    background-color: #343a40;
+    z-index: 99;
+}
+
+thead tr th {
+  border-top: 0 !important;
+}
+
+thead th a {
+  color: #fff;
+}
+
+.convCont {
+  display: block;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.convCont img {
+  width: 20px;
+}
+
+.curAlign {
+  vertical-align: middle;
+}
+
+.convCont .perc {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 10px;
+  padding: 0 6px;
+}
+
+.convCont .perc img {
+  width: 16px;
+  margin: auto;
+  margin-bottom: 4px;
+}
+
+.heart {
+    position:absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom:0;
+    margin:auto;
+    animation: beat .8s infinite alternate;
+}
+
+.modal-content {
+  border: 0;
+}
+
+/* Heart beat animation */
+@keyframes beat{
+    to { transform: scale(1.2); }
+}
+
+small {
+  font-size: 70%;
+}
