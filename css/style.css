@@ -257,3 +257,10 @@ thead th a {
 small {
   font-size: 70%;
 }
+
+.reload {
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #007bff!important;
+}
