@@ -412,7 +412,7 @@ function setAllData() {
     let _now = convertDateToUTC(new Date());
     let count = 0;
     let _config = JSON.parse(window.localStorage.getItem("config"));
-    let currency = window.localStorage.getItem("storedCurrency") || 'usd';
+    let currency = 'php';
 
     if(_config != null) {
       if(_config != null) {
