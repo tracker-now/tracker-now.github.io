@@ -80,7 +80,7 @@ th, td {
 
 .chartOverviewCont,
 .overviewCont {
-  background: #575c62;
+  background: #333;
   border-radius: 10px;
   color: #fff;
   box-shadow: 1px 2px 8px 1px #575c628f;
@@ -263,4 +263,12 @@ small {
   border-radius: 10px;
   padding: 10px 12px;
   color: #007bff!important;
+}
+
+.bgdark {
+  background-color: #000 !important;
+}
+
+.table-dark {
+  background: #333 !important;
 }

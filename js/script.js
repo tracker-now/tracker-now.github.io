@@ -553,3 +553,8 @@ function setImportData(id) {
     reader.readAsText(configFile.files[0]);
   });
 }
+
+function reLoad() {
+  window.location.href = window.location.href;
+  $('#loading').show();
+}
