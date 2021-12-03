@@ -96,6 +96,14 @@ jQuery(document).ready(function($) {
     window.localStorage.setItem("storedCurrency", 'php');
     window.location.reload();
   })
+
+  let time = new Date(Date.now()).getUTCMinutes();
+  if(time < 58) {
+    reloadWhen = 58 - time;
+    setTimeout(function () {
+      reLoad();
+    }, reloadWhen * 60000);
+  }
 })
 
 function loadScholar(i) {
