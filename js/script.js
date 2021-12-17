@@ -255,7 +255,7 @@ function scholarDetails(data, i) {
   _overAllData[trimRonin][_now]['avg'] = _avg;
   _overAllData[trimRonin][_now]['managerSLP'] = _managerSLP;
   _overAllData[trimRonin][_now]['scholarSLP'] = _scholarSLP;
-  _overAllData[trimRonin][_now]['roninSLP'] = data['claimable_total'];
+  _overAllData[trimRonin][_now]['roninSLP'] = 0//data['claimable_total'];
 
   window.sessionStorage.setItem("overAllData", JSON.stringify(_overAllData));
 }
