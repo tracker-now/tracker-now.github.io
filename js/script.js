@@ -315,10 +315,9 @@ function storeSlp(trimRonin, slp, lastClaim) {
       _storedSlp[trimRonin][_now]['currSlp'] = _currSlp;
     } else {
       _currSlp = _storedSlp[trimRonin][_now]['slp'] - _storedSlp[trimRonin][_prevDate]['slp'];
+      _storedSlp[trimRonin][_now]['bmc'] = 0;
       if(_data['mmr'] < 1000) {
         _storedSlp[trimRonin][_now]['bmc'] = _storedSlp[trimRonin][_prevDate]['bmc'] + 1;
-      } else {
-        _storedSlp[trimRonin][_now]['bmc'] = 0;
       }
       _storedSlp[trimRonin][_now]['day'] = _storedSlp[trimRonin][_prevDate]['day'] + 1;
       if(_currSlp < 0) {
