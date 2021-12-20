@@ -264,7 +264,7 @@ function scholarDetails(data, i) {
 function displayRow(i) {
   let trimRonin = i.eth.replace("ronin:", "");
 
-  $('#detail').append(`<tr id="${trimRonin}"><th scope="row"><a href="#" onclick="reloadScholar('${trimRonin}')"><span class="bi bi-arrow-clockwise"></span></a></th>
+  $('#detail').append(`<tr id="${trimRonin}"><td><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
     <td><span>${i.name}</span></td>
     <td class="schoAVG"></td>
     <td class="schoToday"></td>
