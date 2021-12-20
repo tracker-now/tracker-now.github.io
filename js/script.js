@@ -49,7 +49,7 @@ jQuery(document).ready(function($) {
     let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
     if(_data != null) {
       $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr'] != undefined ? _data['mmr'] : 0}</span>`);
-      $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate'] != undefined ? _data['win_rate'] : 0}</span>%`);
+      // $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate'] != undefined ? _data['win_rate'] : 0}</span>%`);
     }
   }
 
@@ -155,16 +155,16 @@ function schoLeaderboard(i) {
           let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
           if(_data == null) _data = {};
           _data['mmr'] = result.items[1].elo;
-          let _lose = result.items[1].draw_total + result.items[1].lose_total;
-          if(_lose == 0) {
-            _data['win_rate'] = 0;
-          } else {
-            _data['win_rate'] = result.items[1].win_total / _lose;
-          }
+          // let _lose = result.items[1].draw_total + result.items[1].lose_total;
+          // if(_lose == 0) {
+          //   _data['win_rate'] = 0;
+          // } else {
+          //   _data['win_rate'] = result.items[1].win_total / _lose;
+          // }
           window.sessionStorage.setItem(trimRonin, JSON.stringify(_data));
 
           $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr']}</span>`);
-          $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate']}</span>%`);
+          // $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate']}</span>%`);
         }
         jQuery('#'+trimRonin).find('.bi-arrow-clockwise').removeClass('icn-spinner');
       },
@@ -172,7 +172,7 @@ function schoLeaderboard(i) {
         let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
         if(_data != null) {
           $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr'] != undefined ? _data['mmr'] : 0}</span>`);
-          $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate'] != undefined ? _data['win_rate'] : 0}</span>%`);
+          // $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate'] != undefined ? _data['win_rate'] : 0}</span>%`);
         }
         jQuery('#'+trimRonin).find('.bi-arrow-clockwise').removeClass('icn-spinner');
       }
@@ -209,7 +209,8 @@ function setRowSLPData(_data, i, trimRonin) {
   $('#'+trimRonin+' .schoAVG').html(`<span class=${_avg <= 50 ? "b-danger" : _avg < 75 ? "b-warning" : "b-success"}>${_avg}</span>`);
   $('#'+trimRonin+' .schoToday').html(`<span class=${_currSlp <= 50 ? "b-danger" : _currSlp < 75 ? "b-warning" : "b-success"}>${_currSlp}</span>`);
   $('#'+trimRonin+' .schoYesterday').html(`<span class=${_yesterdaySlp <= 50 ? "b-danger" : _yesterdaySlp < 75 ? "b-warning" : "b-success"}>${_yesterdaySlp}</span>`);
-  $('#'+trimRonin+' .schoLast').html(`${_lastClaim > 1000 ? '<span>0</span>' : ('<span>'+Math.round(_lastClaim)+'</span>')+' days ago'}`);
+  $('#'+trimRonin+' .schoWin').html(`<span>${_storedSlp[trimRonin][_now]['bmc']}</span>`);
+  $('#'+trimRonin+' .schoLast').html(`${_lastClaim > 1000 ? '<span>0</span>' : ('<span>'+Math.round(_lastClaim)+'</span>')+' days'}`);
   $('#'+trimRonin+' .schoNext').html(`<div class=${Math.round(_lastClaim) < 14 ? "b-warning" : "b-success"}>${_lastClaim > 1000 ? '<span>Now</span>' : (14 - Math.round(_lastClaim)) <= 0 ? '<span>Now</span>' :'In <span>'+(14 - Math.round(_lastClaim))+'</span> days'} <br><small>${_nxtClaim.toLocaleDateString().replaceAll('/','-') + ' ' + (_nxtClaim.getHours() > 12 ? (_nxtClaim.getHours() - 12) + ':' + (_nxtClaim.getMinutes() < 10 ? '0'+_nxtClaim.getMinutes() : _nxtClaim.getMinutes()) + ' PM' : _nxtClaim.getHours() + ':' + (_nxtClaim.getMinutes() < 10 ? '0'+_nxtClaim.getMinutes() : _nxtClaim.getMinutes()) + ' AM')}</small></div>`);
   $('#'+trimRonin+' .schoUnclaim').html(`<span>${dollarUSLocale.format(_unclaimed)}</span>${_getSlpPrice != null ? ('<br><small>'+ dollarUSLocale.format(_unclaimed * _getSlpPrice['current_price'])+ ' ' +_getSlpPrice['currency'].toUpperCase()+'</small>') : ''}`);
   $('#'+trimRonin+' .schoRonin').html(`<span>${dollarUSLocale.format(_data['claimable_total'])}</span>${_getSlpPrice != null ? ('<br><small>'+ dollarUSLocale.format(_data['claimable_total'] * _getSlpPrice['current_price'])+ ' ' +_getSlpPrice['currency'].toUpperCase()+'</small>') : ''}`);
@@ -269,6 +270,7 @@ function displayRow(i) {
     <td class="schoToday"></td>
     <td class="schoYesterday"></td>
     <td class="schoMmr"></td>
+    <td class="schoWin"></td>
     <td class="schoLast"></td>`);
 }
 
@@ -287,6 +289,7 @@ function storeSlp(trimRonin, slp, lastClaim) {
   // store slp with Date
   let _now = convertDateToUTC(new Date());
   let _storedSlp = JSON.parse(window.localStorage.getItem("storedSlp"));
+  let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
   let _currSlp = 0;
 
   if(_storedSlp == null) {
@@ -312,6 +315,11 @@ function storeSlp(trimRonin, slp, lastClaim) {
       _storedSlp[trimRonin][_now]['currSlp'] = _currSlp;
     } else {
       _currSlp = _storedSlp[trimRonin][_now]['slp'] - _storedSlp[trimRonin][_prevDate]['slp'];
+      if(_data['mmr'] < 1000) {
+        _storedSlp[trimRonin][_now]['bmc'] = _storedSlp[trimRonin][_prevDate]['bmc'] + 1;
+      } else {
+        _storedSlp[trimRonin][_now]['bmc'] = 0;
+      }
       _storedSlp[trimRonin][_now]['day'] = _storedSlp[trimRonin][_prevDate]['day'] + 1;
       if(_currSlp < 0) {
         _currSlp = slp;
