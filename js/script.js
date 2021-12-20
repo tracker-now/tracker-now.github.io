@@ -47,9 +47,11 @@ jQuery(document).ready(function($) {
   function setDefaultLeaderboard(i) {
     let trimRonin = i.eth.replace("ronin:", "");
     let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
+    let _now = convertDateToUTC(new Date());
+    let _storedSlp = JSON.parse(window.localStorage.getItem("storedSlp"));
     if(_data != null) {
       $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr'] != undefined ? _data['mmr'] : 0}</span>`);
-      // $('#'+trimRonin+' .schoWin').html(`<span>${_data['win_rate'] != undefined ? _data['win_rate'] : 0}</span>%`);
+      $('#'+trimRonin+' .schoWin').html(`<span>${_storedSlp[trimRonin][_now]['bmc'] != undefined ? _storedSlp[trimRonin][_now]['bmc'] : 0}</span>`);
     }
   }
 
@@ -315,7 +317,9 @@ function storeSlp(trimRonin, slp, lastClaim) {
       _storedSlp[trimRonin][_now]['currSlp'] = _currSlp;
     } else {
       _currSlp = _storedSlp[trimRonin][_now]['slp'] - _storedSlp[trimRonin][_prevDate]['slp'];
-      _storedSlp[trimRonin][_now]['bmc'] = 0;
+      if(!(_storedSlp[trimRonin][_now]['bmc'] && _data['mmr'] == undefined)) {
+        _storedSlp[trimRonin][_now]['bmc'] = 0;
+      }
       if(_data['mmr'] < 1000) {
         _storedSlp[trimRonin][_now]['bmc'] = _storedSlp[trimRonin][_prevDate]['bmc'] + 1;
       }
