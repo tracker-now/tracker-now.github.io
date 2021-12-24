@@ -1,4 +1,32 @@
 let _loader = [];
+let _loader2 = [];
+
+const RONIN_PROVIDER = 'https://api.roninchain.com/rpc';
+const SLP_CONTRACT = '0xa8754b9fa15fc18bb59458815510e40a12cd2014';
+const BALANCE_ABI = [
+    {
+      "constant": true,
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+]
+var web3 = new Web3(new Web3.providers.HttpProvider(RONIN_PROVIDER));
 
 jQuery(document).ready(function($) {
   let _config = JSON.parse(window.localStorage.getItem("config"));
@@ -10,6 +38,7 @@ jQuery(document).ready(function($) {
     }
     for (var i in _config) {
       loadScholar(_config[i]);
+      loadRoninSLP(_config[i]);
     }
     for (var i in _config) {
       schoLeaderboard(_config[i]);
@@ -35,6 +64,7 @@ jQuery(document).ready(function($) {
 
       _conf[trimRonin] = _data;
       loadScholar(_data);
+      loadRoninSLP(_data);
       window.localStorage.setItem("config", JSON.stringify(_conf));
 
       $('#sName').val('');
@@ -226,8 +256,38 @@ function reloadScholar(r) {
   if(_conf != null) {
     jQuery('#'+_conf[r].eth.replace("ronin:", "")).find('.bi-arrow-clockwise').addClass('icn-spinner');
     loadScholar(_conf[r]);
+    loadRoninSLP(_conf[r]);
     schoLeaderboard(_conf[r]);
   }
+}
+
+function loadRoninSLP(i) {
+  _loader2.push(1);
+  var ctr = new web3.eth.Contract(BALANCE_ABI, SLP_CONTRACT);
+  let trimRonin = i.eth.replace("ronin:", "");
+  ctr.methods.balanceOf(
+    web3.utils.toChecksumAddress(i.eth.replace("ronin:", "0x"))
+  ).call()
+  .then(ret => {
+    let _data = JSON.parse(window.sessionStorage.getItem(trimRonin));
+    let _getSlpPrice = JSON.parse(window.sessionStorage.getItem("getSlpPrice"));
+    if(_data == null) _data = {};
+    if(!_data['total']) _data['total'] = 0;
+    if(!_data['claimable_total']) _data['claimable_total'] = 0;
+    let roninSLP = parseInt(ret);
+
+    let _unclaimed = _data['total'] - _data['claimable_total'];
+    let _total = _unclaimed + roninSLP;
+    _data['ronin_slp'] = roninSLP;
+    _data['new_total'] = _total;
+    window.sessionStorage.setItem(trimRonin, JSON.stringify(_data));
+
+    _loader2.pop();
+    if(_loader2.length == 0) {
+      window.sessionStorage.setItem('sessionLoaded', 'yes');
+      $('#loading').hide();
+    }
+  });
 }
 
 function scholarDetails(data, i) {
@@ -258,7 +318,7 @@ function scholarDetails(data, i) {
   _overAllData[trimRonin][_now]['avg'] = _avg;
   _overAllData[trimRonin][_now]['managerSLP'] = _managerSLP;
   _overAllData[trimRonin][_now]['scholarSLP'] = _scholarSLP;
-  _overAllData[trimRonin][_now]['roninSLP'] = 0//data['claimable_total'];
+  _overAllData[trimRonin][_now]['roninSLP'] = data['ronin_slp'];
 
   window.sessionStorage.setItem("overAllData", JSON.stringify(_overAllData));
 }
@@ -266,7 +326,7 @@ function scholarDetails(data, i) {
 function displayRow(i) {
   let trimRonin = i.eth.replace("ronin:", "");
 
-  $('#detail').append(`<tr id="${trimRonin}"><td><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
+  $('#detail').append(`<tr id="${trimRonin}"><td class="reload-cont"><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
     <td><span>${i.name}</span></td>
     <td class="schoAVG"></td>
     <td class="schoToday"></td>

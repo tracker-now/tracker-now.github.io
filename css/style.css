@@ -272,3 +272,8 @@ small {
 .table-dark {
   background: #333 !important;
 }
+
+.reload-cont {
+  padding-left: 1rem !important;
+  padding-right: 0px !important;
+}
