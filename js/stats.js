@@ -55,6 +55,9 @@ function loadData(i, url) {
       let _energy = 'pending';
       if(data.meta_data.max_energy) {
         _energy = data.player_stat.remaining_energy;
+        if(data.player_stat.remaining_energy == 0) {
+          _energy = 'done';
+        }
       }
       $('#'+trimRonin+' .schoEnergy').html(_energy);
     }
