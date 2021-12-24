@@ -52,25 +52,25 @@ function loadData(i, url) {
   data: {},
   success: function (data) {
     if(url == 'player-stats') {
-      let _energy = 'pending';
+      let _energy = 'PND';
       if(data.meta_data.max_energy) {
         _energy = data.player_stat.remaining_energy;
         if(data.player_stat.remaining_energy == 0) {
-          _energy = 'done';
+          _energy = 'DNE';
         }
       }
-      $('#'+trimRonin+' .schoEnergy').html(_energy);
+      $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'PND' ? "b-danger" : _energy == 'DNE' ? "b-success" : "b-warning"}>${_energy}</span>`);
     }
     if(url == 'quests') {
-      let _checkin = data.items[0].missions[0].is_completed ? 'done' : 'pending';
-      let _pve = data.items[0].missions[1].is_completed ? 'done' : 'pending';
-      let _pvp = data.items[0].missions[2].is_completed ? 'done' : 'pending';
-      let _claimed = data.items[0].claimed ? 'done' : 'pending';
+      let _checkin = data.items[0].missions[0].is_completed ? 'DNE' : 'PND';
+      let _pve = data.items[0].missions[1].is_completed ? 'DNE' : 'PND';
+      let _pvp = data.items[0].missions[2].is_completed ? 'DNE' : 'PND';
+      let _claimed = data.items[0].claimed ? 'DNE' : 'PND';
 
-      $('#'+trimRonin+' .schoCheckin').html(_checkin);
-      $('#'+trimRonin+' .schoPvE').html(_pve);
-      $('#'+trimRonin+' .schoPvP').html(_pvp);
-      $('#'+trimRonin+' .schoClaimed').html(_claimed);
+      $('#'+trimRonin+' .schoCheckin').html(`<span class=${_checkin == 'PND' ? "b-danger" : "b-success"}>${_checkin}</span>`);
+      $('#'+trimRonin+' .schoPvE').html(`<span class=${_pve == 'PND' ? "b-danger" : "b-success"}>${_pve}</span>`);
+      $('#'+trimRonin+' .schoPvP').html(`<span class=${_pvp == 'PND' ? "b-danger" : "b-success"}>${_pvp}</span>`);
+      $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'PND' ? "b-danger" : "b-success"}>${_claimed}</span>`);
     }
   },
   error: function () { },
