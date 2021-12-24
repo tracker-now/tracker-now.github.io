@@ -31,10 +31,12 @@ function displayRow(i) {
 function editScholar(r) {
   let _config = JSON.parse(window.localStorage.getItem("config"));
   if(_config != null && _config[r]) {
+    var decryptedBytes = CryptoJS.AES.decrypt(_config[r].key, "gj*d%uV@zJpiFCsG");
+    var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
 
     $('#sName').val(_config[r].name);
     $('#sRonin').val(_config[r].eth);
-    $('#sKey').val(_config[r].key);
+    $('#sKey').val(_key);
     $('#addScholar').modal('show');
   }
 }
@@ -42,12 +44,14 @@ function editScholar(r) {
 function loadData(i, url) {
   let xRonin = i.eth.replace("ronin:", "0x");
   let trimRonin = i.eth.replace("ronin:", "");
+  var decryptedBytes = CryptoJS.AES.decrypt(i.key, "gj*d%uV@zJpiFCsG");
+  var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
 
   $.ajax({
   url: 'https://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
   type: 'GET',
   beforeSend: function (xhr) {
-      xhr.setRequestHeader('Authorization', 'Bearer '+i.key);
+      xhr.setRequestHeader('Authorization', 'Bearer '+_key);
   },
   data: {},
   success: function (data) {
@@ -77,6 +81,31 @@ function loadData(i, url) {
   });
 }
 
+$('#saveBtn').click(() => {
+  if(validateScholar()) {
+    let _conf = JSON.parse(window.localStorage.getItem("config"));
+    if(_conf == null) {
+      _conf = {}
+    }
+
+    var encryptedKey = CryptoJS.AES.encrypt($('#sKey').val(), "gj*d%uV@zJpiFCsG").toString();
+    let _data = {}
+    _data['name'] = $('#sName').val();
+    _data['eth'] = $('#sRonin').val();
+    _data['key'] = encryptedKey;
+
+    let trimRonin = $('#sRonin').val().replace("ronin:", "");
+
+    _conf[trimRonin] = _data;
+    window.localStorage.setItem("config", JSON.stringify(_conf));
+
+    $('#sName').val('');
+    $('#sRonin').val('');
+    $('#sPerc').val('');
+    $('#addScholar').modal('hide');
+  }
+})
+
 function exportData(id) {
     let dataStr = window.localStorage.getItem(id);
     let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -101,4 +130,29 @@ function setImportData(id) {
     });
     reader.readAsText(configFile.files[0]);
   });
+}
+
+function validateScholar() {
+  let valid = true;
+  if($('#sName').val().length < 3) {
+    valid = false;
+    $('#sName').addClass('b-invalid');
+  } else {
+    $('#sName').removeClass('b-invalid');
+  }
+
+  if($('#sRonin').val().length != 46) {
+    valid = false;
+    $('#sRonin').addClass('b-invalid');
+  } else {
+    $('#sRonin').removeClass('b-invalid');
+  }
+
+  if($('#sKey').val().length == 0) {
+    valid = false;
+    $('#sKey').addClass('b-invalid');
+  } else {
+    $('#sKey').removeClass('b-invalid');
+  }
+  return valid;
 }
