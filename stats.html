@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" href="img/love-potion.png">
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="axie-management">
+    <link rel="apple-touch-icon" href="img/love-potion.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <!-- Icon -->
+    <link rel="stylesheet" href="./css/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <title>Axie Scholar Management</title>
+  </head>
+  <body class="bgdark">
+    <!-- <div id="loading">
+      <img src="img/love-potion.png" class="heart" />
+    </div> -->
+    <div class="p-2 pt-3">
+      <button type="button" class="btn btn-primary ml-2 mb-2" data-toggle="modal" data-target="#manageData">Manage Data</button>
+    </div>
+
+    <form>
+      <div class="form-group p-2">
+        <table class="table table-dark fink sortable">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Name</th>
+              <th scope="col">Energy</th>
+              <th scope="col">CheckIn</th>
+              <th scope="col">PvE</th>
+              <th scope="col">PvP</th>
+              <th scope="col">Claimed</th>
+              <th scope="col">Manage</th>
+            </tr>
+          </thead>
+          <tbody id="detail">
+          </tbody>
+        </table>
+      </div>
+    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addScholar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body bg-dark text-white">
+            <div class="form-group">
+              <label for="sName">Scholar name</label>
+              <input class="form-control bg-dark text-white" type="text" id="sName">
+            </div>
+            <div class="form-group">
+              <label for="sRonin">Ronin Address</label>
+              <input class="form-control bg-dark text-white" type="text" id="sRonin">
+            </div>
+            <div class="form-group">
+              <label for="sKey">Key</label>
+              <input class="form-control bg-dark text-white" type="text" id="sKey">
+            </div>
+            <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="manageData" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body bg-dark">
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="exportData('config')">Export Scholar Data</button>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="document.getElementById('config').click()">Import Scholar Data</button>
+              <input id="config" hidden type="file"/>
+            </div>
+            <div class="form-group">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/jquery-3.5.1.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/sortable.js"></script>
+    <script src="./js/stats.js"></script>
+  </body>
+</html>
