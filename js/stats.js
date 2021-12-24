@@ -156,3 +156,8 @@ function validateScholar() {
   }
   return valid;
 }
+
+function reLoad() {
+  window.location.reload();
+  $('#loading').show();
+}

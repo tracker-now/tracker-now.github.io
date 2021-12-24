@@ -634,6 +634,6 @@ function setImportData(id) {
 }
 
 function reLoad() {
-  window.location.href = window.location.href;
+  window.location.reload();
   $('#loading').show();
 }
