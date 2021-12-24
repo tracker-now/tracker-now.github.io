@@ -23,6 +23,7 @@ function displayRow(i) {
     <td class="schoEnergy"></td>
     <td class="schoCheckin"></td>
     <td class="schoPvE"></td>
+    <td class="schoPvESLP"></td>
     <td class="schoPvP"></td>
     <td class="schoClaimed"></td>
     <td><a href="#" onclick="editScholar('${trimRonin}')" class="text-primary"><span class="bi bi-pencil-square"></span></a></td>`);
@@ -39,6 +40,12 @@ function editScholar(r) {
     $('#sKey').val(_key);
     $('#addScholar').modal('show');
   }
+}
+
+function reloadScholar(i) {
+  let _config = JSON.parse(window.localStorage.getItem("config"));
+  loadData(_config[i], 'player-stats');
+  loadData(_config[i], 'quests');
 }
 
 function loadData(i, url) {
@@ -63,7 +70,10 @@ function loadData(i, url) {
           _energy = 'DNE';
         }
       }
+      let _pveSLP = data.player_stat.pve_slp_gained_last_day;
+
       $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'PND' ? "b-danger" : _energy == 'DNE' ? "b-success" : "b-warning"}>${_energy}</span>`);
+      $('#'+trimRonin+' .schoPvESLP').html(`<span class=${_pveSLP == 50 ? "b-success" : _pveSLP == 0 ? "b-danger" : "b-warning"}>${_pveSLP}</span>`);
     }
     if(url == 'quests') {
       let _checkin = data.items[0].missions[0].is_completed ? 'DNE' : 'PND';
