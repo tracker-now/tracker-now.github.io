@@ -54,15 +54,15 @@ function loadData(i, url) {
     if(url == 'player-stats') {
       let _energy = 0;
       if(data.meta_data.max_energy) {
-        _energy = data.remaining_energy;
+        _energy = data.player_stat.remaining_energy;
       }
       $('#'+trimRonin+' .schoEnergy').html(_energy);
     }
     if(url == 'quests') {
-      let _checkin = data[0].missions[0].is_completed;
-      let _pve = data[0].missions[1].is_completed;
-      let _pvp = data[0].missions[2].is_completed;
-      let _claimed = data[0].claimed ? true : false;
+      let _checkin = data.items[0].missions[0].is_completed;
+      let _pve = data.items[0].missions[1].is_completed;
+      let _pvp = data.items[0].missions[2].is_completed;
+      let _claimed = data.items[0].claimed ? true : false;
 
       $('#'+trimRonin+' .schoCheckin').html(_checkin);
       $('#'+trimRonin+' .schoPvE').html(_pve);
