@@ -44,7 +44,7 @@ function loadData(i, url) {
   let trimRonin = i.eth.replace("ronin:", "");
 
   $.ajax({
-  url: 'http://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
+  url: 'https://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
   type: 'GET',
   beforeSend: function (xhr) {
       xhr.setRequestHeader('Authorization', 'Bearer '+i.key);
