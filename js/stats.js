@@ -42,8 +42,7 @@ function editScholar(r) {
 function loadData(i, url) {
   let xRonin = i.eth.replace("ronin:", "0x");
   let trimRonin = i.eth.replace("ronin:", "");
-  $('#'+trimRonin+' .schoEnergy').html(4);
-  return;
+
   $.ajax({
   url: 'game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
   type: 'GET',
