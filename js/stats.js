@@ -1,9 +1,9 @@
 let _loader = [];
 
 jQuery(document).ready(function($) {
-  setImportData('config');
+  setImportData('statsConf');
 
-  let _config = JSON.parse(window.localStorage.getItem("config"));
+  let _config = JSON.parse(window.localStorage.getItem("statsConf"));
 
   if(_config != null) {
     for (var i in _config) {
@@ -32,7 +32,7 @@ function displayRow(i) {
 }
 
 function editScholar(r) {
-  let _config = JSON.parse(window.localStorage.getItem("config"));
+  let _config = JSON.parse(window.localStorage.getItem("statsConf"));
   if(_config != null && _config[r]) {
     var decryptedBytes = CryptoJS.AES.decrypt(_config[r].key, "gj*d%uV@zJpiFCsG");
     var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
@@ -45,7 +45,7 @@ function editScholar(r) {
 }
 
 function reloadScholar(i) {
-  let _config = JSON.parse(window.localStorage.getItem("config"));
+  let _config = JSON.parse(window.localStorage.getItem("statsConf"));
   loadData(_config[i], 'player-stats');
   loadData(_config[i], 'quests');
 }
@@ -123,7 +123,7 @@ function loadData(i, url) {
 
 $('#saveBtn').click(() => {
   if(validateScholar()) {
-    let _conf = JSON.parse(window.localStorage.getItem("config"));
+    let _conf = JSON.parse(window.localStorage.getItem("statsConf"));
     if(_conf == null) {
       _conf = {}
     }
@@ -137,7 +137,7 @@ $('#saveBtn').click(() => {
     let trimRonin = $('#sRonin').val().replace("ronin:", "");
 
     _conf[trimRonin] = _data;
-    window.localStorage.setItem("config", JSON.stringify(_conf));
+    window.localStorage.setItem("statsConf", JSON.stringify(_conf));
 
     $('#sName').val('');
     $('#sRonin').val('');
