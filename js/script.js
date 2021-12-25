@@ -80,8 +80,12 @@ jQuery(document).ready(function($) {
     let _now = convertDateToUTC(new Date());
     let _storedSlp = JSON.parse(window.localStorage.getItem("storedSlp"));
     if(_data != null) {
+      let _bmc = 0
+      if(_storedSlp[trimRonin][_now] != null) {
+        _bmc = _storedSlp[trimRonin][_now]['bmc'];
+      }
       $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr'] != undefined ? _data['mmr'] : 0}</span>`);
-      $('#'+trimRonin+' .schoWin').html(`<span>${_storedSlp[trimRonin][_now]['bmc'] != undefined ? _storedSlp[trimRonin][_now]['bmc'] : 0}</span>`);
+      $('#'+trimRonin+' .schoWin').html(`<span>${_bmc != undefined ? _bmc : 0}</span>`);
     }
   }
 
