@@ -1,3 +1,5 @@
+let _loader = [];
+
 jQuery(document).ready(function($) {
   setImportData('config');
 
@@ -18,7 +20,7 @@ jQuery(document).ready(function($) {
 function displayRow(i) {
   let trimRonin = i.eth.replace("ronin:", "");
 
-  $('#detail').append(`<tr id="${trimRonin}"><th scope="row" class="reload-cont"><a href="#" onclick="reloadScholar('${trimRonin}')"><span class="bi bi-arrow-clockwise"></span></a></th>
+  $('#detail').append(`<tr id="${trimRonin}">
     <td><span>${i.name}</span></td>
     <td class="schoEnergy"></td>
     <td class="schoCheckin"></td>
@@ -53,42 +55,70 @@ function loadData(i, url) {
   let trimRonin = i.eth.replace("ronin:", "");
   var decryptedBytes = CryptoJS.AES.decrypt(i.key, "gj*d%uV@zJpiFCsG");
   var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
+  let _now = convertDateToUTC(new Date());
+  let _cached = JSON.parse(window.localStorage.getItem(trimRonin));
+  if(_cached == null) _cached = {};
+  if(_cached[_now] == null) {
+    _cached[_now] = {};
+    window.localStorage.removeItem(trimRonin);
+  }
 
-  $.ajax({
-  url: 'https://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
-  type: 'GET',
-  beforeSend: function (xhr) {
-      xhr.setRequestHeader('Authorization', 'Bearer '+_key);
-  },
-  data: {},
-  success: function (data) {
-    if(url == 'player-stats') {
-      let _energy = 'PND';
-      if(data.meta_data.max_energy) {
-        _energy = data.player_stat.remaining_energy;
-        if(data.player_stat.remaining_energy == 0) {
-          _energy = 'DNE';
+  if(!(_cached[_now]['energy'] && _cached[_now]['claim'])) {
+    _loader.push(1);
+    $.ajax({
+    url: 'https://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
+    type: 'GET',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer '+_key);
+    },
+    data: {},
+    success: function (data) {
+      if(url == 'player-stats') {
+        let _energy = 'PND';
+        if(data.meta_data.max_energy) {
+          _energy = data.player_stat.remaining_energy;
+          if(data.player_stat.remaining_energy == 0) {
+            _energy = 'DNE';
+            _cached[_now]['energy'] = 1;
+            window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
+          }
         }
+        let _pveSLP = data.player_stat.pve_slp_gained_last_day;
+
+        $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'PND' ? "b-danger" : _energy == 'DNE' ? "b-success" : "b-warning"}>${_energy}</span>`);
+        $('#'+trimRonin+' .schoPvESLP').html(`<span class=${_pveSLP == 50 ? "b-success" : _pveSLP == 0 ? "b-danger" : "b-warning"}>${_pveSLP}</span>`);
       }
-      let _pveSLP = data.player_stat.pve_slp_gained_last_day;
+      if(url == 'quests') {
+        let _checkin = data.items[0].missions[0].is_completed ? 'DNE' : 'PND';
+        let _pve = data.items[0].missions[1].is_completed ? 'DNE' : 'PND';
+        let _pvp = data.items[0].missions[2].is_completed ? 'DNE' : 'PND';
+        let _claimed = data.items[0].claimed ? 'DNE' : 'PND';
 
-      $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'PND' ? "b-danger" : _energy == 'DNE' ? "b-success" : "b-warning"}>${_energy}</span>`);
-      $('#'+trimRonin+' .schoPvESLP').html(`<span class=${_pveSLP == 50 ? "b-success" : _pveSLP == 0 ? "b-danger" : "b-warning"}>${_pveSLP}</span>`);
-    }
-    if(url == 'quests') {
-      let _checkin = data.items[0].missions[0].is_completed ? 'DNE' : 'PND';
-      let _pve = data.items[0].missions[1].is_completed ? 'DNE' : 'PND';
-      let _pvp = data.items[0].missions[2].is_completed ? 'DNE' : 'PND';
-      let _claimed = data.items[0].claimed ? 'DNE' : 'PND';
+        _cached[_now]['claim'] = data.items[0].claimed;
+        window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
 
-      $('#'+trimRonin+' .schoCheckin').html(`<span class=${_checkin == 'PND' ? "b-danger" : "b-success"}>${_checkin}</span>`);
-      $('#'+trimRonin+' .schoPvE').html(`<span class=${_pve == 'PND' ? "b-danger" : "b-success"}>${_pve}</span>`);
-      $('#'+trimRonin+' .schoPvP').html(`<span class=${_pvp == 'PND' ? "b-danger" : "b-success"}>${_pvp}</span>`);
-      $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'PND' ? "b-danger" : "b-success"}>${_claimed}</span>`);
+        $('#'+trimRonin+' .schoCheckin').html(`<span class=${_checkin == 'PND' ? "b-danger" : "b-success"}>${_checkin}</span>`);
+        $('#'+trimRonin+' .schoPvE').html(`<span class=${_pve == 'PND' ? "b-danger" : "b-success"}>${_pve}</span>`);
+        $('#'+trimRonin+' .schoPvP').html(`<span class=${_pvp == 'PND' ? "b-danger" : "b-success"}>${_pvp}</span>`);
+        $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'PND' ? "b-danger" : "b-success"}>${_claimed}</span>`);
+      }
+    },
+    error: function () { },
+    complete: function () {
+      _loader.pop();
+      if(_loader.length == 0) {
+        $('#loading').hide();
+      }
     }
-  },
-  error: function () { },
-  });
+    });
+  } else {
+    $('#'+trimRonin+' .schoEnergy').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoPvESLP').html(`<span class="b-success">50</span>`);
+    $('#'+trimRonin+' .schoCheckin').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoPvE').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoPvP').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoClaimed').html(`<span class="b-success">DNE</span>`);
+  }
 }
 
 $('#saveBtn').click(() => {
@@ -167,7 +197,74 @@ function validateScholar() {
   return valid;
 }
 
+function convertDateToUTC(date) {
+  return (getDateUTC(date).getMonth()+1)+'/'+getDateUTC(date).getDate()+'/'+getDateUTC(date).getFullYear();
+}
+
+function getDateUTC(date) {
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+}
+
 function reLoad() {
   window.location.reload();
   $('#loading').show();
 }
+
+var pStart = { x: 0, y: 0 };
+var pStop = { x: 0, y: 0 };
+
+function swipeStart(e) {
+  if (typeof e["targetTouches"] !== "undefined") {
+    var touch = e.targetTouches[0];
+    pStart.x = touch.screenX;
+    pStart.y = touch.screenY;
+  } else {
+    pStart.x = e.screenX;
+    pStart.y = e.screenY;
+  }
+}
+
+function swipeEnd(e) {
+  if (typeof e["changedTouches"] !== "undefined") {
+    var touch = e.changedTouches[0];
+    pStop.x = touch.screenX;
+    pStop.y = touch.screenY;
+  } else {
+    pStop.x = e.screenX;
+    pStop.y = e.screenY;
+  }
+
+  swipeCheck();
+}
+
+function swipeCheck() {
+  var changeY = pStart.y - pStop.y;
+  var changeX = pStart.x - pStop.x;
+  if (isPullDown(changeY, changeX)) {
+    reLoad();
+  }
+}
+
+function isPullDown(dY, dX) {
+  // methods of checking slope, length, direction of line created by swipe action
+  return (
+    dY < 0 &&
+    ((Math.abs(dX) <= 100 && Math.abs(dY) >= 300) ||
+      (Math.abs(dX) / Math.abs(dY) <= 0.3 && dY >= 60))
+  );
+}
+
+document.addEventListener(
+  "touchstart",
+  function (e) {
+    swipeStart(e);
+  },
+  false
+);
+document.addEventListener(
+  "touchend",
+  function (e) {
+    swipeEnd(e);
+  },
+  false
+);
