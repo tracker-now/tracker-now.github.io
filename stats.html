@@ -68,6 +68,7 @@
             <div class="form-group">
               <label for="sKey">Key</label>
               <input class="form-control bg-dark text-white" type="text" id="sKey">
+              <input id="file-selector"  type="file"/>
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
           </div>
@@ -98,5 +99,24 @@
     <script src="./js/sortable.js"></script>
     <script src="./js/aes.js"></script>
     <script src="./js/stats.js"></script>
+
+    <script type="module">
+        import QrScanner from "./js/qr-scanner.min.js";
+        QrScanner.WORKER_PATH = './js/qr-scanner-worker.min.js';
+
+        const fileQrResult = document.getElementById('file-qr-result');
+        const fileSelector = document.getElementById('file-selector');
+        let currentScho;
+
+        fileSelector.addEventListener('change', event => {
+            const file = fileSelector.files[0];
+            if (!file) {
+                return;
+            }
+            QrScanner.scanImage(file)
+                .then(result => $('#sKey').val(result))
+                .catch(e => console.log(e));
+        });
+    </script>
   </body>
 </html>
