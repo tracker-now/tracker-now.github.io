@@ -121,13 +121,17 @@
           video,
           result => {
             $('#sKey').val(result);
-            scanner.stop();
+            stopScan();
           },
           error => {
             $('#sKey').val(error);
-            scanner.stop();
+            stopScan();
           }
         );
+
+        function stopScan() {
+          scanner.stop();
+        }
 
         scanner.start().then(() => {
           // List cameras after the scanner started to avoid listCamera's stream and the scanner's stream being requested
