@@ -76,6 +76,10 @@
                   <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
                 </div>
                 <input id="qr-selector" hidden type="file"/>
+    <select id="cam-list">
+        <option value="environment" selected>Environment Facing (default)</option>
+        <option value="user">User Facing</option>
+    </select>
                 <video id="qr-video"></video>
               </div>
             </div>
@@ -115,6 +119,7 @@
 
         const fileQrResult = document.getElementById('file-qr-result');
         const fileSelector = document.getElementById('qr-selector');
+    const camList = document.getElementById('cam-list');
         const video = document.getElementById('qr-video');
 
         const scanner = new QrScanner(
