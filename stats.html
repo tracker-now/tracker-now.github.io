@@ -153,7 +153,7 @@
           const region = document.getElementById('show-scan-region');
           region.appendChild(scanner.$canvas);
           scanner.$canvas.style.display = 'block';
-          scanner.$canvas.style.width = '360px';
+          scanner.$canvas.style.width = $('#show-scan-region')[0].clientWidth+'px';
           $('#img-qr').hide();
           $('#start-qr').hide();
           $('#cancel-qr').show();
