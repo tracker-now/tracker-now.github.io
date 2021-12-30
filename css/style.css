@@ -115,6 +115,12 @@ th, td {
   border-color: #3673b4;
 }
 
+.btn-success {
+  color: #fff;
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
 .scholarChart .row {
   border: 1px solid #888;
   margin: 0;
