@@ -139,9 +139,9 @@
         function stopScan() {
           scanner.stop();
           $('canvas').remove();
-          imgQr.show();
-          startQr.show();
-          cancelQr.hide();
+          $('#img-qr').show();
+          $('#start-qr').show();
+          $('#cancel-qr').hide();
         }
 
         cancelQr.addEventListener('click', () => {
@@ -154,9 +154,9 @@
           region.appendChild(scanner.$canvas);
           scanner.$canvas.style.display = 'block';
           scanner.$canvas.style.width = ''
-          imgQr.hide();
-          startQr.hide();
-          cancelQr.show();
+          $('#img-qr').hide();
+          $('#start-qr').hide();
+          $('#cancel-qr').show();
         });
 
         fileSelector.addEventListener('change', event => {
