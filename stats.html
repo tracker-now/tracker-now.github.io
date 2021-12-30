@@ -76,11 +76,8 @@
                   <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
                 </div>
                 <input id="qr-selector" hidden type="file"/>
-                <video id="qr-video"></video>
-                <label>
-        <input id="show-scan-region" type="checkbox">
-        Show scan region
-    </label>
+                <video id="qr-video" hidden></video>
+                <div id="prev-vid"></div>
               </div>
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
@@ -138,8 +135,8 @@
 
         document.getElementById('start-qr').addEventListener('click', () => {
           scanner.start();
-          const label = document.getElementById('show-scan-region').parentNode;
-          label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
+          const prev = document.getElementById('prev-vid');
+          prev.insertBefore(scanner.$canvas, prev.nextSibling);
           scanner.$canvas.style.display = 'block';
         });
 
