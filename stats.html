@@ -127,7 +127,7 @@
             $('#sKey').val(error);
             scanner.stop();
           }
-        });
+        );
 
         scanner.start().then(() => {
           // List cameras after the scanner started to avoid listCamera's stream and the scanner's stream being requested
@@ -142,6 +142,10 @@
           }));
         });
 
+        document.getElementById('start-qr').addEventListener('click', () => {
+          scanner.start();
+        });
+
         fileSelector.addEventListener('change', event => {
           const file = fileSelector.files[0];
           if (!file) {
@@ -150,10 +154,6 @@
           QrScanner.scanImage(file)
               .then(result => $('#sKey').val(result))
               .catch(e => $('#sKey').val(e));
-        });
-
-        document.getElementById('start-qr').addEventListener('click', () => {
-          scanner.start();
         });
     </script>
   </body>
