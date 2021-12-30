@@ -70,18 +70,18 @@
               <div class="input-group">
                 <input class="form-control bg-dark text-white" type="text" id="sKey">
                 <div class="input-group-append">
-                  <span class="btn btn-primary input-group-text" onclick="document.getElementById('qr-selector').click()">Use QR</span>
+                  <span class="btn btn-primary input-group-text" id="img-qr" onclick="document.getElementById('qr-selector').click()">Img QR</span>
                 </div>
                 <div class="input-group-append">
                   <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
                 </div>
+                <div class="input-group-append">
+                  <span class="btn btn-danger input-group-text" hidden id="cancel-qr">Cancel Scan</span>
+                </div>
                 <input id="qr-selector" hidden type="file"/>
               </div>
             </div>
-            <div>
-              <div>
-                  <div id="show-scan-region"><div>
-              </div>
+            <div id="show-scan-region">
               <video id="qr-video" hidden></video>
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
@@ -121,6 +121,9 @@
         const fileQrResult = document.getElementById('file-qr-result');
         const fileSelector = document.getElementById('qr-selector');
         const video = document.getElementById('qr-video');
+        const imgQr = document.getElementById('img-qr');
+        const startQr = document.getElementById('start-qr');
+        const cancelQr = document.getElementById('cancel-qr');
 
         const scanner = new QrScanner(
           video,
@@ -136,13 +139,19 @@
         function stopScan() {
           scanner.stop();
           $('canvas').remove();
+          imgQr.show();
+          startQr.show();
+          cancelQr.hide();
         }
 
         document.getElementById('start-qr').addEventListener('click', () => {
           scanner.start();
-          const label = document.getElementById('show-scan-region').parentNode;
-          label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
+          const region = document.getElementById('show-scan-region');
+          region.appendChild(scanner.$canvas);
           scanner.$canvas.style.display = 'block';
+          imgQr.hide();
+          startQr.hide();
+          cancelQr.show();
         });
 
         fileSelector.addEventListener('change', event => {

@@ -121,6 +121,12 @@ th, td {
   border-color: #1e7e34;
 }
 
+.btn-danger {
+  color: #fff;
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
 .scholarChart .row {
   border: 1px solid #888;
   margin: 0;
