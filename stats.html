@@ -144,11 +144,16 @@
           cancelQr.hide();
         }
 
+        cancelQr.addEventListener('click', () => {
+          stopScan();
+        });
+
         document.getElementById('start-qr').addEventListener('click', () => {
           scanner.start();
           const region = document.getElementById('show-scan-region');
           region.appendChild(scanner.$canvas);
           scanner.$canvas.style.display = 'block';
+          scanner.$canvas.style.width = ''
           imgQr.hide();
           startQr.hide();
           cancelQr.show();
