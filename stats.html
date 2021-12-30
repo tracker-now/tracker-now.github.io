@@ -125,7 +125,6 @@
           },
           error => {
             $('#sKey').val(error);
-            stopScan();
           }
         );
 
@@ -148,6 +147,7 @@
 
         document.getElementById('start-qr').addEventListener('click', () => {
           scanner.start();
+          scanner.$canvas.style.display = 'block';
         });
 
         fileSelector.addEventListener('change', event => {
