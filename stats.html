@@ -76,11 +76,11 @@
                   <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
                 </div>
                 <input id="qr-selector" hidden type="file"/>
-    <select id="cam-list">
-        <option value="environment" selected>Environment Facing (default)</option>
-        <option value="user">User Facing</option>
-    </select>
                 <video id="qr-video"></video>
+                <label>
+        <input id="show-scan-region" type="checkbox">
+        Show scan region
+    </label>
               </div>
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
@@ -119,7 +119,6 @@
 
         const fileQrResult = document.getElementById('file-qr-result');
         const fileSelector = document.getElementById('qr-selector');
-    const camList = document.getElementById('cam-list');
         const video = document.getElementById('qr-video');
 
         const scanner = new QrScanner(
@@ -138,14 +137,10 @@
         }
 
         document.getElementById('start-qr').addEventListener('click', () => {
-          scanner.start().then(() => {
-            QrScanner.listCameras(true).then(cameras => cameras.forEach(camera => {
-              const option = document.createElement('option');
-              option.value = camera.id;
-              option.text = camera.label;
-              camList.add(option);
-            }));
-          });
+          scanner.start();
+          const label = document.getElementById('show-scan-region').parentNode;
+          label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
+          scanner.$canvas.style.display = 'block';
         });
 
         fileSelector.addEventListener('change', event => {
