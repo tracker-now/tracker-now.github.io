@@ -135,6 +135,7 @@
 
         function stopScan() {
           scanner.stop();
+          $('canvas').remove();
         }
 
         document.getElementById('start-qr').addEventListener('click', () => {
