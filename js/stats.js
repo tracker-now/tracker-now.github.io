@@ -103,7 +103,13 @@ function loadData(i, url) {
         $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'PND' ? "b-danger" : "b-success"}>${_claimed}</span>`);
       }
     },
-    error: function () { },
+    error: function (err) {
+      if(err.responseJSON.error_type == 'INTERNAL_SERVER_ERROR') {
+        setTimeout(function () {
+          loadData(i, url);
+        }, 5000);
+      }
+    },
     complete: function () {
       _loader.pop();
       if(_loader.length == 0) {
