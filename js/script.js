@@ -393,10 +393,10 @@ function storeSlp(trimRonin, slp, lastClaim) {
         _storedSlp[trimRonin][_now]['day'] = (slp > 0 ? 1 : 0);
         _storedSlp[trimRonin][_now]['reset'] = true;
       }
-      if(_currSlp > _storedSlp[trimRonin][_now]['currSlp']) {
-        _storedSlp[trimRonin][_now]['currSlp'] = _currSlp;
-      } else {
+      if(_storedSlp[trimRonin][_now]['currSlp'] > _currSlp) {
         _currSlp = _storedSlp[trimRonin][_now]['currSlp'];
+      } else {
+        _storedSlp[trimRonin][_now]['currSlp'] = _currSlp;
       }
     }
   }
