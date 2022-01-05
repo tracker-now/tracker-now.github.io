@@ -82,7 +82,7 @@ function getEthPrice(currency) {
     url: 'https://api.coingecko.com/api/v3/coins/ethereum'+'?'+minuteCache(),
     success: function(result) {
       let cryptData = {};
-      cryptData['thumb'] = result.image.small;
+      cryptData['thumb'] = './img/ethereum.png';
       cryptData['current_price'] = result.market_data.current_price[currency];
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
@@ -99,7 +99,7 @@ function getAxsPrice(currency) {
     url: 'https://api.coingecko.com/api/v3/coins/axie-infinity'+'?'+minuteCache(),
     success: function(result) {
       let cryptData = {};
-      cryptData['thumb'] = result.image.small;
+      cryptData['thumb'] = './img/axie_infinity_logo.png';
       cryptData['current_price'] = result.market_data.current_price[currency];
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
@@ -116,7 +116,7 @@ function getSlpPrice(currency, data) {
     url: 'https://api.coingecko.com/api/v3/coins/smooth-love-potion'+'?'+minuteCache(),
     success: function(result) {
       let cryptData = {};
-      cryptData['thumb'] = result.image.small;
+      cryptData['thumb'] = './img/slp.png';
       cryptData['current_price'] = result.market_data.current_price[currency];
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
@@ -166,7 +166,7 @@ function loadData(i, url) {
         }
         let _pveSLP = data.player_stat.pve_slp_gained_last_day;
 
-        $('#unclaimedTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/energy.png"></div><div class="col col-sm-8"><small>Energy</small><span class=${_energy == 'Pending' ? "text-danger" : ""}>${_energy}</span></div></div>`);
+        $('#unclaimedTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/energy-pl.png"></div><div class="col col-sm-8"><small>Energy</small><span class=${_energy == 'Pending' ? "text-danger" : ""}>${_energy}</span></div></div>`);
         $('#managerTotal #pveBox small').html(`PVE&nbsp:&nbsp${_pveSLP}&nbspslp`);
       }
       if(url == 'quests') {
