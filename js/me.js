@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
       let _ySlp = {};
       _ySlp[_yesterday] = {}
       _ySlp[_yesterday]['total'] = $('#ySlp').val();
-      window.sessionStorage.setItem('meSlp', JSON.stringify(_ySlp));
+      window.localStorage.setItem('meSlp', JSON.stringify(_ySlp));
 
       $('#sRonin').val('');
       $('#sPerc').val('');
@@ -45,9 +45,25 @@ jQuery(document).ready(function($) {
   })
 
   $('#adscho').click(() => {
-    $('#ySlp').val('');
-    $('#sRonin').val('');
-    $('#sPerc').val('');
+    let _conf = JSON.parse(window.localStorage.getItem("meConf"));
+    let _ySlpConf = JSON.parse(window.localStorage.getItem("meSlp"));
+
+    if(_conf) {
+      var yesterDate = new Date();
+      yesterDate.setDate(yesterDate.getDate() - 1);
+      let _yesterday = convertDateToUTC(yesterDate);
+      let _slp = 0;
+      if(_ySlpConf && _ySlpConf[_yesterday] && _ySlpConf[_yesterday]['total']) {
+        _slp = _ySlpConf[_yesterday]['total'];
+      }
+
+      var decryptedBytes = CryptoJS.AES.decrypt(_conf.key, "DT.yB9)<UL*xf8{x");
+      var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+      $('#ySlp').val(_slp);
+      $('#sRonin').val(_conf.eth);
+      $('#sKey').val(_key);
+    }
   });
 
   function validateScholar() {
@@ -87,7 +103,6 @@ function getEthPrice(currency) {
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
 
-      window.sessionStorage.setItem("getEthPrice", JSON.stringify(cryptData));
       setCryptoPrice('#convETH', cryptData);
     }
   });
@@ -104,7 +119,6 @@ function getAxsPrice(currency) {
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
 
-      window.sessionStorage.setItem("getAxsPrice", JSON.stringify(cryptData));
       setCryptoPrice('#convAXS', cryptData);
     }
   });
@@ -121,7 +135,6 @@ function getSlpPrice(currency, data) {
       cryptData['price_change_percentage_24h'] = result.market_data.price_change_percentage_24h;
       cryptData['currency'] = currency;
 
-      window.sessionStorage.setItem("getSlpPrice", JSON.stringify(cryptData));
       setCryptoPrice('#convSLP', cryptData);
     }
   });
@@ -210,16 +223,15 @@ function loadSlp(i) {
     cache: false,
     success: function(res) {
       if(res.success) {
-        let _data = JSON.parse(window.sessionStorage.getItem('meSlp'));
-        console.log(_data);
+        let _data = JSON.parse(window.localStorage.getItem('meSlp'));
+
         if(_data == null) _data = {};
-        console.log(_data);
         if(_data[_now] == null) {
           let temp = 0;
           if(_data[_yesterday] && _data[_yesterday]['total']) {
             temp = _data[_yesterday]['total'];
           }
-          console.log(temp);
+
           _data = {};
           _data[_now] = {};
           _data[_yesterday] = {};
@@ -230,7 +242,7 @@ function loadSlp(i) {
         if(_data[_yesterday] && _data[_yesterday]['total']) {
           slpNow = _data[_now]['total'] - _data[_yesterday]['total'];
         }
-        window.sessionStorage.setItem('meSlp', JSON.stringify(_data));
+        window.localStorage.setItem('meSlp', JSON.stringify(_data));
         $('#overAllTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/slp.png"></div><div class="col col-sm-8"><small>SLP Today</small><span>${slpNow}</span></div></div>`);
       }
     },
