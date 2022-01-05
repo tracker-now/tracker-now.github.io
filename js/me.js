@@ -167,7 +167,7 @@ function loadData(i, url) {
         let _pveSLP = data.player_stat.pve_slp_gained_last_day;
 
         $('#unclaimedTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/energy.png"></div><div class="col col-sm-8"><small>Energy</small><span class=${_energy == 'Pending' ? "text-danger" : ""}>${_energy}</span></div></div>`);
-        $('#managerTotal #pveBox small').html(`PVE&nbsp:&nbsp${_pveSLP}`);
+        $('#managerTotal #pveBox small').html(`PVE&nbsp:&nbsp${_pveSLP}&nbspslp`);
       }
       if(url == 'quests') {
         let _checkin = data.items[0].missions[0].is_completed ? 'Done' : 'Pending';
@@ -178,7 +178,7 @@ function loadData(i, url) {
 
         $('#pveBox').append(`<span class="${_pve == 'Pending' ? "text-danger" : "text-success"}">${_pve}</span>`);
         $('#claimedTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/checked.png"></div><div class="col col-sm-8"><small>Check In</small><span class=${_checkin == 'Pending' ? "text-danger" : "text-success"}>${_checkin}</span></div></div>`);
-        $('#scholarTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/pvp.png"></div><div class="col col-sm-8"><small>PVP&nbsp:&nbsp${_pvpProg}</small><span class="${_pvp == 'Pending' ? "text-danger" : "text-success"}">${_pvp}</span></div></div>`);
+        $('#scholarTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/pvp.png"></div><div class="col col-sm-8"><small>PVP&nbsp:&nbsp${_pvpProg}&nbspwin</small><span class="${_pvp == 'Pending' ? "text-danger" : "text-success"}">${_pvp}</span></div></div>`);
         $('#averageTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/claim.png"></div><div class="col col-sm-8"><small>Claimed</small><span class=${_claimed == 'Pending' ? "text-danger" : "text-success"}>${_claimed}</span></div></div>`);
       }
     },
