@@ -27,6 +27,7 @@ function displayRow(i) {
     <td class="schoPvE"></td>
     <td class="schoPvESLP"></td>
     <td class="schoPvP"></td>
+    <td class="schoPvPPROG"></td>
     <td class="schoClaimed"></td>
     <td><a href="#" onclick="editScholar('${trimRonin}')" class="text-primary"><span class="bi bi-pencil-square"></span></a></td>`);
 }
@@ -57,6 +58,7 @@ function loadData(i, url) {
   var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
   let _now = convertDateToUTC(new Date());
   let _cached = JSON.parse(window.localStorage.getItem(trimRonin));
+
   if(_cached == null) _cached = {};
   if(_cached[_now] == null) {
     _cached[_now] = {};
@@ -74,33 +76,36 @@ function loadData(i, url) {
     data: {},
     success: function (data) {
       if(url == 'player-stats') {
-        let _energy = 'PND';
+        let _energy = 'XX';
+        _cached[_now]['energy'] = 0;
         if(data.meta_data.max_energy) {
-          _energy = data.player_stat.remaining_energy;
+          _energy = toDoubleDigit(data.player_stat.remaining_energy);
           if(data.player_stat.remaining_energy == 0) {
-            _energy = 'DNE';
             _cached[_now]['energy'] = 1;
-            window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
           }
         }
-        let _pveSLP = data.player_stat.pve_slp_gained_last_day;
+        window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
+        let _pveSLP = toDoubleDigit(data.player_stat.pve_slp_gained_last_day);
 
-        $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'PND' ? "b-danger" : _energy == 'DNE' ? "b-success" : "b-warning"}>${_energy}</span>`);
+        $('#'+trimRonin+' .schoEnergy').html(`<span class=${_energy == 'XX' ? "b-danger" : _energy == '00' ? "b-success" : "b-warning"}>${_energy}</span>`);
         $('#'+trimRonin+' .schoPvESLP').html(`<span class=${_pveSLP == 50 ? "b-success" : _pveSLP == 0 ? "b-danger" : "b-warning"}>${_pveSLP}</span>`);
       }
       if(url == 'quests') {
-        let _checkin = data.items[0].missions[0].is_completed ? 'DNE' : 'PND';
-        let _pve = data.items[0].missions[1].is_completed ? 'DNE' : 'PND';
-        let _pvp = data.items[0].missions[2].is_completed ? 'DNE' : 'PND';
-        let _claimed = data.items[0].claimed ? 'DNE' : 'PND';
+        let _checkin = data.items[0].missions[0].is_completed ? 'Y' : 'N';
+        let _pve = data.items[0].missions[1].is_completed ? 'Y' : 'N';
+        let _pvp = data.items[0].missions[2].is_completed ? 'Y' : 'N';
+        let _pvpProg = toDoubleDigit(data.items[0].missions[2].progress);
+        let _claimed = data.items[0].claimed ? 'Y' : 'N';
 
-        _cached[_now]['claim'] = data.items[0].claimed;
+        _cached[_now]['claim'] = data.items[0].claimed ? 1 : 0;
+        _cached[_now]['win'] = _pvpProg;
         window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
 
-        $('#'+trimRonin+' .schoCheckin').html(`<span class=${_checkin == 'PND' ? "b-danger" : "b-success"}>${_checkin}</span>`);
-        $('#'+trimRonin+' .schoPvE').html(`<span class=${_pve == 'PND' ? "b-danger" : "b-success"}>${_pve}</span>`);
-        $('#'+trimRonin+' .schoPvP').html(`<span class=${_pvp == 'PND' ? "b-danger" : "b-success"}>${_pvp}</span>`);
-        $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'PND' ? "b-danger" : "b-success"}>${_claimed}</span>`);
+        $('#'+trimRonin+' .schoCheckin').html(`<span class=${_checkin == 'N' ? "b-danger" : "b-success"}>${_checkin}</span>`);
+        $('#'+trimRonin+' .schoPvE').html(`<span class=${_pve == 'N' ? "b-danger" : "b-success"}>${_pve}</span>`);
+        $('#'+trimRonin+' .schoPvP').html(`<span class=${_pvp == 'N' ? "b-danger" : "b-success"}>${_pvp}</span>`);
+        $('#'+trimRonin+' .schoClaimed').html(`<span class=${_claimed == 'N' ? "b-danger" : "b-success"}>${_claimed}</span>`);
+        $('#'+trimRonin+' .schoPvPPROG').html(`<span class=${_pvpProg >= 5 ? "b-success" : _pvpProg == 0 ? "b-danger" : "b-warning"}>${_pvpProg}</span>`);
       }
     },
     error: function (err) {
@@ -118,13 +123,21 @@ function loadData(i, url) {
     }
     });
   } else {
-    $('#'+trimRonin+' .schoEnergy').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoEnergy').html(`<span class="b-success">Y</span>`);
     $('#'+trimRonin+' .schoPvESLP').html(`<span class="b-success">50</span>`);
-    $('#'+trimRonin+' .schoCheckin').html(`<span class="b-success">DNE</span>`);
-    $('#'+trimRonin+' .schoPvE').html(`<span class="b-success">DNE</span>`);
-    $('#'+trimRonin+' .schoPvP').html(`<span class="b-success">DNE</span>`);
-    $('#'+trimRonin+' .schoClaimed').html(`<span class="b-success">DNE</span>`);
+    $('#'+trimRonin+' .schoPvPPROG').html(`<span class="b-success">${_cached[_now]['win']}</span>`);
+    $('#'+trimRonin+' .schoCheckin').html(`<span class="b-success">Y</span>`);
+    $('#'+trimRonin+' .schoPvE').html(`<span class="b-success">Y</span>`);
+    $('#'+trimRonin+' .schoPvP').html(`<span class="b-success">Y</span>`);
+    $('#'+trimRonin+' .schoClaimed').html(`<span class="b-success">Y</span>`);
   }
+}
+
+function toDoubleDigit(num) {
+  return num.toLocaleString('en-US', {
+    minimumIntegerDigits: 2,
+    useGrouping: false
+  })
 }
 
 $('#saveBtn').click(() => {
