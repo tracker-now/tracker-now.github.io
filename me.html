@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" href="img/love-potion.png">
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="axie-management">
+    <link rel="apple-touch-icon" href="img/love-potion.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <!-- Icon -->
+    <link rel="stylesheet" href="./css/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <title>Axie Tracker</title>
+  </head>
+  <body class="bgdark" style="max-width: 500px;">
+    <div id="loading">
+      <img src="img/love-potion.png" class="heart" />
+    </div>
+
+    <div class="p-2 pt-3">
+      <div class="float-right">
+        <span class="bi bi-arrow-clockwise reload" onclick="reLoad()"></span>
+      </div>
+
+      <button id="adscho" type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#addScholar">Set Data</button>
+
+      <div class="container rfix">
+        <!-- <div class="col col-sm-9"> -->
+          <div class="row">
+            <div class="col col-6 sum-box-l">
+              <div id="convSLP" class="overviewCont">
+              </div>
+            </div>
+            <div class="col col-6 sum-box-r">
+              <div id="convRON" class="overviewCont">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-6 sum-box-l">
+              <div id="convAXS" class="overviewCont">
+              </div>
+            </div>
+            <div class="col col-6 sum-box-r">
+              <div id="convETH" class="overviewCont">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-6 sum-box-l">
+              <div id="unclaimedTotal" class="overviewCont">
+              </div>
+            </div>
+            <div class="col col-6 sum-box-r">
+              <div id="overAllTotal" class="overviewCont">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-6 sum-box-l">
+              <div id="managerTotal" class="overviewCont">
+              </div>
+            </div>
+            <div class="col col-6 sum-box-r">
+              <div id="scholarTotal" class="overviewCont">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-6 sum-box-l">
+              <div id="claimedTotal" class="overviewCont">
+              </div>
+            </div>
+            <div class="col col-6 sum-box-r">
+              <div id="averageTotal" class="overviewCont">
+              </div>
+            </div>
+          </div>
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addScholar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body bg-dark text-white">
+            <div class="form-group">
+              <label for="sRonin">Ronin Address</label>
+              <input class="form-control bg-dark text-white" type="text" id="sRonin">
+            </div>
+            <div class="form-group">
+              <label for="ySlp">Total Slp Yesterday (Check Inventory)</label>
+              <input class="form-control bg-dark text-white" type="text" id="ySlp">
+            </div>
+            <div class="form-group m-0">
+              <label for="sKey">Key</label>
+              <div class="input-group">
+                <input class="form-control bg-dark text-white" type="text" id="sKey">
+                <div class="input-group-append">
+                  <span class="btn btn-primary input-group-text" id="img-qr" onclick="document.getElementById('qr-selector').click()">Img QR</span>
+                </div>
+                <div class="input-group-append">
+                  <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
+                </div>
+                <div class="input-group-append">
+                  <span class="btn btn-danger input-group-text" id="cancel-qr" style="display: none;">Cancel Scan</span>
+                </div>
+                <input id="qr-selector" hidden type="file"/>
+              </div>
+            </div>
+            <div id="show-scan-region">
+              <video id="qr-video" hidden></video>
+            </div>
+            <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="manageData" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body bg-dark">
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="exportData('config')">Export Scholar Data</button>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="document.getElementById('config').click()">Import Scholar Data</button>
+              <input id="config" hidden type="file"/>
+            </div>
+
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="exportData('storedSlp')">Export SLP History</button>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary form-control" onclick="document.getElementById('storedSlp').click()">Import SLP History</button>
+              <input id="storedSlp" hidden type="file"/>
+            </div>
+            <div class="form-group">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/jquery-3.5.1.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/sortable.js"></script>
+    <script src="./js/aes.js"></script>
+    <script src="./js/me.js"></script>
+
+    <script type="module">
+        import QrScanner from "./js/qr-scanner.min.js";
+        QrScanner.WORKER_PATH = './js/qr-scanner-worker.min.js';
+
+        const fileQrResult = document.getElementById('file-qr-result');
+        const fileSelector = document.getElementById('qr-selector');
+        const video = document.getElementById('qr-video');
+        const imgQr = document.getElementById('img-qr');
+        const startQr = document.getElementById('start-qr');
+        const cancelQr = document.getElementById('cancel-qr');
+
+        const scanner = new QrScanner(
+          video,
+          result => {
+            $('#sKey').val(result);
+            stopScan();
+          },
+          error => {
+            $('#sKey').val(error);
+          }
+        );
+
+        function stopScan() {
+          scanner.stop();
+          $('canvas').remove();
+          $('#img-qr').show();
+          $('#start-qr').show();
+          $('#cancel-qr').hide();
+        }
+
+        cancelQr.addEventListener('click', () => {
+          stopScan();
+        });
+
+        document.getElementById('start-qr').addEventListener('click', () => {
+          scanner.start();
+          const region = document.getElementById('show-scan-region');
+          region.appendChild(scanner.$canvas);
+          scanner.$canvas.style.display = 'block';
+          scanner.$canvas.style.width = $('#show-scan-region')[0].clientWidth+'px';
+          scanner.$canvas.style.margin = '0 0 1rem 0';
+          $('#img-qr').hide();
+          $('#start-qr').hide();
+          $('#cancel-qr').show();
+        });
+
+        fileSelector.addEventListener('change', event => {
+          const file = fileSelector.files[0];
+          if (!file) {
+              return;
+          }
+          QrScanner.scanImage(file)
+              .then(result => $('#sKey').val(result))
+              .catch(e => $('#sKey').val(e));
+        });
+    </script>
+  </body>
+</html>
