@@ -1,0 +1,548 @@
+
+<html>
+    <head>
+        <title>Axie Kunai Attack!</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js" integrity="sha384-xdEN7ies9cZm/l8HslPhg0lGG/uQuIW2KQ/EVt71QFjarfJWY95fAMqbqw/1C2rX" crossorigin="anonymous"></script>
+        <script src="./js/pixi-spine.js"></script>
+        <script src="./js/api.js"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+    </head>
+    <body>
+        <div id="headerDiv"></div><br/>
+        <div class="container">
+            <div class="row ml-0">
+                <form class="form row ml-0" onsubmit="getAxie(); $('#axieID').blur(); return false; ">
+                    <input id="axieID" class="form-inline form-control-sm col-5" placeholder="Axie ID" value="2595"/>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="getAxie()">Load Axie</button>
+                </form>
+
+                <a class="mt-2" href="https://axieinfinity.com/encyclopedia?stage=4&r=freak" target="_blank">Find an Axie in the encyclopedia</a>
+            </div>
+
+            <div id="scoreDiv" class="row">
+                <div class="col-6 text-left">Score: <span class="col-6" id="scoreText">0</span>&nbsp;&nbsp;&nbsp;<span class="col-6" id="highScore"></span></div>
+                <div class="col-6 text-left">Difficulty: <span id="difficultyText">5</span></div>
+            </div>
+            <div id="imageLoc">
+            </div>
+            <div>
+            Use the arrows keys to move (wasd works too).<br/>
+            'r' to restart.<br/>
+            ']' to increase difficulty<br/>
+            '[' to decrease difficulty<br/>
+            </div>
+        </div>
+
+
+    </body>
+    <script>
+        const debug = false;
+        var spine;
+        var axieID = -1;
+        var oldID;
+        var app;
+        var axie;
+        const SCALING_FACTOR = 0.4;
+        const KUNAI_SPEED = 12;
+        const AXIE_SPEED = 6;
+        var kunais = {};
+        const BASE_KUNAIS_PER_SECOND = 0.8;
+        var kunaisPerSecond = BASE_KUNAIS_PER_SECOND;
+        var score = 0;
+        const BASE_DIFFICULTY = 5;
+        const MAX_DIFFICULTY = 5;
+        const MIN_DIFFICULTY = -5;
+        var difficulty = 0;
+        const scoreIncrement = 10;
+        var startText;
+        var started = false;
+        var hit = new Audio('assets/hit.mp3');
+
+        function togglePause() {
+            PIXI.spine.Spine.globalAutoUpdate = !PIXI.spine.Spine.globalAutoUpdate;
+        }
+
+        function downloadImage() {
+            var button = document.getElementById('IDButton');
+            let canvas = document.getElementById("canvas");
+            let dataURL = app.renderer.extract.canvas(app.stage).toDataURL();
+            button.href = dataURL;
+            button.download = axieID + ".png";
+        }
+
+        function init() {
+            app = new PIXI.Application(2048, 1024, {backgroundColor : 0xffffff /*,  transparent: true*/ });
+            app.view.id = "canvas";
+            app.view.style.height = 480;
+            app.view.style.border = "1px solid #d9d9d9";
+            document.getElementById("imageLoc").appendChild(app.view);
+            var storedAxieID = localStorage.getItem("storedAxieID");
+            if (storedAxieID != null) {
+                $("#axieID").val(parseInt(storedAxieID));
+            }
+
+        }
+
+        async function getAxie() {
+            oldID = axieID;
+            axieID = parseInt($("#axieID").val());
+            if (!axieID) {
+                alert("bad axie ID");
+                return;
+            }
+            //if (oldID == axieID) return;
+            localStorage.setItem("storedAxieID", axieID);
+
+            //Test site
+            // data = await getAxieDetails(axieID)
+            // if (data.stage < 3) {
+            //     alert("This axie is either a larva or an egg.")
+            //     return;
+            // }
+            let imageName = axieID + ".png";
+            //prevent using cache...AI servers have wonky CORS config.
+
+            atlasURL = "https://storage.googleapis.com/assets.axieinfinity.com/axies/" + axieID + "/axie/axie.atlas";
+            //atlasURL = "https://storage.googleapis.com/assets.axieinfinity.com/axies/" + axieID + "/petite/petite.atlas";
+            //imageURL =  data["figure"]["images"][imageName];
+            //imageURL =  data["figure"]["axie"]["image"];
+            imageURL = "https://storage.googleapis.com/assets.axieinfinity.com/axies/" + axieID + "/axie/axie.png";
+            //imageURL = "https://storage.googleapis.com/assets.axieinfinity.com/axies/" + axieID + "/petite/petite.png";
+            //modelURL = data["figure"]["axie"]["spineModel"];
+            modelURL = "https://storage.googleapis.com/assets.axieinfinity.com/axies/" + axieID + "/axie/axie.json";
+
+            // atlasURL = data["figure"]["atlas"];
+            // imageURL =  data["figure"]["image"]
+            // modelURL = data["figure"]["model"];
+
+            //more data intensive, but fixes CORS problems (mainly in testing)
+            let breakCache = "?" + escape(new Date());
+            atlasURL +=  breakCache;
+            imageURL +=  breakCache;
+            modelURL +=  breakCache;
+
+            let realImageName = imageURL.slice(imageURL.lastIndexOf("/") + 1, imageURL.length);
+            PIXI.loader.reset();
+            PIXI.loader
+                .add('axie_atlas', atlasURL)
+                .add('axie_png', imageURL)
+                .add('kunai', 'https://freakitties.github.io/axie/pixi/assets/kunai.png')
+                .add('arena', 'https://freakitties.github.io/axie/pixi/assets/arena.png')
+                .load(function (loader, resources) {
+                    //cache false to circumvent server's CORS caching. Server should use Vary: Origin ? or Access-Control-Allow-Origin: *
+                    $.get({url: modelURL, dataType: "json"}, function(rawSkeletonData) {
+                        const rawAtlasData = resources['axie_atlas'].data.replace(/(shadow\s*\n.*?size: )(.*?)(\n.*?\n\s*tail)/s, "$1" + "1, 1" + "$3"); //replace shadow with 1x1 pixel
+                        const spineAtlas = new PIXI.spine.core.TextureAtlas(rawAtlasData, function (line, callback) {
+                            //use hash name instead of name from file
+                            callback(PIXI.BaseTexture.from('axie_png'));
+                        });
+
+                        const spineAtlasLoader = new PIXI.spine.core.AtlasAttachmentLoader(spineAtlas);
+                        const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
+
+                        spineData = spineJsonParser.readSkeletonData(rawSkeletonData);
+
+                        axie = new PIXI.spine.Spine(spineData);
+
+                        //mirror image axie
+                        //axie.scale.x = -1;
+                        axie.scale.set(-SCALING_FACTOR, SCALING_FACTOR);
+
+                        axie.position.set(app.view.width/8 , app.view.height * 0.6);
+
+                        axie.stateData.setMix("action/idle", "action/appear", 0.2);
+                        axie.stateData.setMix("action/appear", "action/idle", 0.2);
+
+                        axie.stateData.setMix("attack/melee/mouth-bite", "action/idle", 0.2);
+                        axie.stateData.setMix("action/idle", "attack/melee/mouth-bite", 0.2);
+
+                        axie.state.setAnimation(0, 'action/idle', true);
+//axie.alpha = 0.3;
+                        app.stage.removeChildren();
+
+                        var arena = new PIXI.Sprite(PIXI.loader.resources.arena.texture)
+                        arena.alpha=0.75;
+                        let bgScale = app.view.width/arena.width;
+                        arena.scale.set(bgScale, bgScale);
+                        arena.position.y = - app.view.height/arena.height * app.view.height;
+                        app.stage.addChild(arena);
+
+                        app.stage.addChild(axie);
+                        PIXI.spine.Spine.globalAutoUpdate = true;
+
+                        if (!started) {
+                            startText = new PIXI.Text("Press Enter to start", {fontFamily : 'Comic Sans MS', fontSize: 75, fill : 0x7A81FF, align : 'center'});
+                            startText.position.x = app.view.width/2 - startText.width/2;
+                            startText.position.y = 50;
+                            app.stage.addChild(startText);
+                        }
+
+                        app.start();
+                        startGameStates();
+                    }).fail(function() {
+                        alert("Failed to get Axie info. Bad Server Config?");
+                        $("#axieID").val(oldID);
+                        axieID = oldID;
+                    });
+                });
+
+        }
+
+
+    init();
+    getAxie();
+
+    // $(document).ready(function(){
+    //     $.ajax({
+    //         url: "/header.html",
+    //         cache: false,
+    //         dataType: "html",
+    //         success: function(data) {
+    //             $("#headerDiv").html(data);
+    //         }
+    //     });
+    // });
+
+    var movingRight = false;
+    var movingUp = false;
+    const incrementX = Math.round(app.view.width * 0.05);
+    const incrementY = Math.round(app.view.height * 0.05);
+    document.onkeydown = function (event) {
+        const keyName = event.key;
+        switch (event.keyCode) {
+            case 37:
+            case 65:
+                //alert('left');
+                //moveLeft(axie, AXIE_SPEED);
+                movingRight = false;
+                let startingPositionLeft = axie.position.x;
+                //axie.position.x -= incrementX;
+                //if (axie.position.x < 0) axie.position.x = 0;
+                let tickerLeft = new PIXI.ticker.Ticker();
+                tickerLeft.add(function () {
+                    console.log("loopL");
+                    if (movingRight) {
+                        if (tickerLeft.started) tickerLeft.destroy();
+                        // delete tickerLeft;
+                    }
+                    axie.position.x -= AXIE_SPEED;
+                    if (axie.position.x < 120) {
+                        axie.position.x = 120;
+                        if (tickerLeft.started) tickerLeft.destroy();
+                        delete tickerLeft;
+                    } else if(axie.position.x <= startingPositionLeft - incrementX) {
+                        if (tickerLeft.started) tickerLeft.destroy();
+                        delete tickerLeft;
+                    }
+                });
+                tickerLeft.start();
+
+                break;
+            case 38:
+            case 87:
+                //alert('up');
+                var movingUp = true;
+                let startingPositionUp = axie.position.y;
+                let tickerUp  =  new PIXI.ticker.Ticker();
+                tickerUp.add(function () {
+                    //console.log("loopU");
+                    if (!movingUp) {
+                        if (tickerUp.started) tickerUp.destroy();
+                        delete tickerUp;
+                    }
+                    let upBounds = axie.getBounds();
+                    axie.position.y -= AXIE_SPEED;
+                    if (axie.position.y <= upBounds.height) {
+                        axie.position.y = upBounds.height;
+                        if (tickerUp.started) tickerUp.destroy();
+                        delete tickerUp;
+                    } else if(axie.position.y <= startingPositionUp - incrementY) {
+                        if (tickerUp.started) tickerUp.destroy();
+                        delete tickerUp;
+                    }
+                });
+                tickerUp.start();
+                break;
+            case 39:
+            case 68:
+                //alert('right');
+                movingRight = true;
+                let startingPositionRight = axie.position.x;
+                let tickerRight  =  new PIXI.ticker.Ticker();
+                tickerRight.add(function () {
+                    //console.log("loopR");
+                    if (!movingRight) {
+                        if (tickerRight.started) tickerRight.destroy();
+                        delete tickerRight;
+                    }
+                    let rightBounds = axie.getBounds();
+                    axie.position.x += AXIE_SPEED;
+                    if (axie.position.x > app.view.width - rightBounds.width/2 - 20) {
+                        axie.position.x = app.view.width - rightBounds.width/2 - 20;
+                        if (tickerRight.started) tickerRight.destroy();
+                        delete tickerRight;
+                    } else if(axie.position.x >= startingPositionRight + incrementX) {
+                        if (tickerRight.started) tickerRight.destroy();
+                        delete tickerRight;
+                    }
+                });
+                tickerRight.start();
+                break;
+            case 40:
+            case 83:
+                //alert('down');
+                movingUp = false;
+                let startingPositionDown = axie.position.y;
+                let tickerDown  =  new PIXI.ticker.Ticker();
+                tickerDown.add(function () {
+                    //console.log("loopD");
+                    if (movingUp) {
+                        if (tickerDown.started) tickerDown.destroy();
+                        delete tickerDown;
+                    }
+                    axie.position.y += AXIE_SPEED;
+                    if (axie.position.y > app.view.height) {
+                        axie.position.y = app.view.height;
+                        if (tickerDown.started) tickerDown.destroy();
+                        delete tickerDown;
+                    } else if(axie.position.y >= startingPositionDown + incrementY) {
+                        if (tickerDown.started) tickerDown.destroy();
+                        delete tickerDown;
+                    }
+                });
+                tickerDown.start();
+                break;
+            case 32:
+                axie.state.setAnimation(0, 'action/appear', false);
+                entry = axie.state.addAnimation(0, 'action/idle', true, 0);
+                /*
+                let startingPositionSpace = axie.position.y;
+                let tickerSpace  =  new PIXI.ticker.Ticker();
+                tickerSpace.add(function () {
+                    //console.log("loopR");
+                    axie.position.y -= 5;
+                    if (axie.position.y < 0) {
+                        axie.position.y = 0;
+                        tickerSpace.destroy();
+                    } else if(axie.position.y <= startingPositionSpace - incrementY) {
+                        tickerSpace.destroy();
+                    }
+                });
+                tickerSpace.start();
+                */
+                break;
+            case 88:
+                axie.state.setAnimation(0, 'attack/melee/mouth-bite', false);
+                axie.state.addAnimation(0, 'action/idle', true, 0);
+                break;
+            case 221:
+                difficulty++;
+                if (difficulty > MAX_DIFFICULTY) difficulty = MAX_DIFFICULTY;
+                kunaisPerSecond = BASE_KUNAIS_PER_SECOND + difficulty * 0.12;
+                $("#difficultyText").text(difficulty + BASE_DIFFICULTY);
+                break;
+            case 219:
+                difficulty--;
+                if (difficulty < MIN_DIFFICULTY) difficulty = MIN_DIFFICULTY;
+                kunaisPerSecond = BASE_KUNAIS_PER_SECOND + difficulty * 0.12;
+                $("#difficultyText").text(difficulty + BASE_DIFFICULTY);
+                break;
+            case 82:
+                getAxie();
+                break;
+            case 13:
+                if (!started) {
+                    kunaiSpawner();
+                    started = true;
+                    app.stage.removeChild(startText);
+                }
+                break;
+        }
+    };
+
+    var kunaiTickers = [];
+    function moveLeft(sprite, speed, destination, id) {
+        if (gameOver) return;
+        let startingPositionLeft = sprite.position.x;
+        if (destination == null) {
+            destination = startingPositionLeft - incrementX;
+        }
+        let tickerLeft  =  new PIXI.ticker.Ticker();
+        kunaiTickers.push(tickerLeft);
+        tickerLeft.add(function () {
+            //console.log("moveL");
+            sprite.position.x -= speed;
+            let bounds = sprite.getBounds();
+            if (sprite.position.x < 0 && bounds.x + Math.abs(bounds.width) < 0) {
+                tickerLeft.destroy();
+                if (id != null) {
+                    app.stage.removeChild(kunais[id].sprite)
+                    delete kunais[id];
+                    score += scoreIncrement;
+                    $("#scoreText").text(score);
+                }
+            } else if(sprite.position.x <= destination) {
+                if (id != null) {
+                    app.stage.removeChild(kunais[id].sprite)
+                    delete kunais[id];
+                    score += scoreIncrement;
+                    $("#scoreText").text(score);
+                }
+                tickerLeft.destroy();
+            } else if (gameOver) {
+                tickerLeft.destroy();
+            }
+        });
+        tickerLeft.start();
+    }
+
+    var kunaiID = 0;
+    function addKunai() {
+        var kunai = new PIXI.Sprite(PIXI.loader.resources.kunai.texture)
+        kunai.position.set(app.view.width , Math.random() * app.view.height);
+        kunai.scale.set(SCALING_FACTOR, SCALING_FACTOR);
+        app.stage.addChild(kunai);
+        new Audio('assets/swing1.mp3').play();
+        app.stage.removeChild(axie);
+        app.stage.addChild(axie);
+        moveLeft(kunai, KUNAI_SPEED, 0 - kunai.width, kunaiID);
+        kunais[kunaiID.toString()] = {sprite: kunai};
+        kunaiID++;
+    }
+
+    var kunaiTimeID;
+    var gameOver = false;
+    function kunaiSpawner() {
+        kunaiTimeID = setInterval(function() {
+            clearInterval(kunaiTimeID);
+            if (gameOver) return;
+            addKunai();
+            kunaiSpawner();
+        }, Math.random() * 1/kunaisPerSecond * 1000);
+
+        //max kunais
+        //time between
+    }
+
+    const fuzzX = 40;
+    const fuzzY = 40;
+    function intersects(ab, bb)
+    {
+        abx = ab.x + ab.width * AXIEBB_X_REDUCTION / 2 + fuzzX;
+        aby = ab.y + ab.height * AXIEBB_Y_REDUCTION / 2;
+        abw = ab.width * (1 - AXIEBB_X_REDUCTION) - fuzzX;
+        abh = ab.height * (1 - AXIEBB_Y_REDUCTION) - fuzzY;
+
+        bbx = bb.x + bb.width/4;
+        bby = bb.y;
+        bbw = bb.width/4;
+        bbh = bb.height;
+        return abx + abw > bbx && abx < bbx + bbw/2 && aby + abh > bb.y && aby < bby + bbh;
+    }
+
+    const AXIEBB_X_REDUCTION = 0.1;
+    const AXIEBB_Y_REDUCTION = 0.2;
+    var g;
+    var g2;
+    function detectCollision() {
+        for (let k in kunais) {
+            let axieBounds = axie.getBounds();
+            let kunaiBounds = kunais[k].sprite.getBounds();
+            if (intersects(axieBounds, kunaiBounds)) {
+                console.log("game over");
+                hit.play();
+                let highScore = localStorage.getItem("highScore");
+                if (score > highScore) {
+                    localStorage.setItem("highScore", score);
+                }
+                gameOver = true;
+                collisionTicker.destroy();
+                let GOText = new PIXI.Text("GAME OVER!", {fontFamily : 'Comic Sans MS', fontSize: 100, fill : 0xff1010, align : 'center'});
+                GOText.position.x = app.view.width/2 - GOText.width/2;
+                GOText.position.y = app.view.height/2 - GOText.height/2;
+                app.stage.addChild(GOText);
+
+                axie.state.setAnimation(0, 'action/appear', false);
+                entry = axie.state.addAnimation(0, 'action/idle', true, 0);
+                axie.state.addListener({complete: function(entry) {
+                    console.log('track '+entry.trackIndex+' completed '+entry.loopsCount()+' times');
+                    app.stop();
+                    togglePause();
+
+                }});
+            }
+
+            if (debug) {
+                if (!kunais[k].bb) {
+                    gk = new PIXI.Graphics();
+                } else {
+                    app.stage.removeChild(kunais[k].bb)
+                }
+                let b = kunaiBounds;
+                gk = new PIXI.Graphics();
+                gk.drawRect(b.x - KUNAI_SPEED + b.width/4, b.y, b.width/4, b.height);
+                gk.alpha = 0.3;
+                app.stage.addChild(gk);
+                kunais[k].bb = gk;
+            }
+
+        }
+        if (debug) {
+            b=axie.getBounds();
+            if (g) {
+                app.stage.removeChild(g);
+            }
+            g = new PIXI.Graphics();
+            g.drawRect(b.x + (b.width * AXIEBB_X_REDUCTION / 2) + fuzzX, b.y + (b.height * AXIEBB_Y_REDUCTION / 2), b.width * (1 - AXIEBB_X_REDUCTION) - fuzzX, b.height * (1 - AXIEBB_Y_REDUCTION) - fuzzY);
+            g.alpha = 0.3;
+            app.stage.addChild(g);
+        }
+    }
+
+    var collisionTicker;
+    function startGameStates() {
+        score = 0;
+        $("#scoreText").text(score);
+        let highScore = localStorage.getItem("highScore");
+        if (highScore) {
+            $("#highScore").text("High Score: " + highScore);
+        }
+        gameOver = false;
+        if (kunaiTickers.length > 0) {
+            for (let t in kunaiTickers) {
+                if (!(t in kunaiTickers)) console.log("t not in kunaiTickers");
+                if (kunaiTickers[t] == null ) console.log("kunaiTickers[t] is null");
+                console.log("destroying kunai");
+                if (kunaiTickers[t].started) {
+                    kunaiTickers[t].destroy();
+                }
+            }
+            kunaiTickers = [];
+        }
+        if (Object.keys(kunais).length > 0) {
+            for (let k in kunais) {
+                delete kunais[k];
+            }
+        }
+        if (!PIXI.spine.Spine.globalAutoUpdate) togglePause();
+        if (collisionTicker && collisionTicker.started) collisionTicker.destroy();
+        collisionTicker = new PIXI.ticker.Ticker();
+        collisionTicker.add(detectCollision);
+        collisionTicker.start();
+        if (kunaiTimeID) {
+            clearInterval(kunaiTimeID);
+        }
+        if (started) {
+            kunaiSpawner();
+        }
+    }
+    </script>
+
+</html>
