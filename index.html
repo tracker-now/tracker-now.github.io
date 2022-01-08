@@ -33,18 +33,16 @@
       <div id="convSLP" class="convCont"></div>
       <div id="convETH" class="convCont"></div>
 
-      <button id="adscho" type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#addScholar">Add New Scholar</button>
-      <button type="button" class="btn btn-primary ml-2 mb-2" data-toggle="modal" data-target="#manageData">Manage Data</button>
-
-
-      <!-- <div class="btn-group btn-group-toggle mb-2 float-right" data-toggle="buttons">
-        <label id="isUSD" class="btn btn-secondary">
-          <input type="radio" name="options" id="option1" autocomplete="off" checked> USD
+      <!-- <button id="adscho" type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#addScholar">Add New Scholar</button> -->
+      <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#manageData">Manage Data</button>
+      <div class="btn-group btn-group-toggle ml-2 mb-2" data-toggle="buttons">
+        <label id="isLink" class="btn btn-secondary">
+          <input type="radio" name="options" id="option1" autocomplete="off" checked> Link
         </label>
-        <label id="isPHP" class="btn btn-secondary">
-          <input type="radio" name="options" id="option2" autocomplete="off"> PHP
+        <label id="isManage" class="btn btn-secondary">
+          <input type="radio" name="options" id="option2" autocomplete="off"> Manage
         </label>
-      </div> -->
+      </div>
 
       <div class="container rfix">
         <!-- <div class="col col-sm-9"> -->
@@ -141,6 +139,10 @@
             <div class="form-group">
               <label for="sPerc">Manager percentage</label>
               <input class="form-control bg-dark text-white" type="text" id="sPerc">
+            </div>
+            <div class="form-group">
+              <label for="ySLP">SLP yesterday</label>
+              <input class="form-control bg-dark text-white" type="text" id="ySLP">
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
           </div>

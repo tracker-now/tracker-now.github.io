@@ -67,9 +67,47 @@ jQuery(document).ready(function($) {
       loadRoninSLP(_data);
       window.localStorage.setItem("config", JSON.stringify(_conf));
 
+      let _storedSlp = JSON.parse(window.localStorage.getItem("storedSlp"));
+      let _ySlp = parseInt($('#ySLP').val());
+      let _ytSlp = _ySlp;
+      let _2Db4Slp = 0;
+
+      if(_storedSlp) {
+        var yesterDate = new Date();
+        yesterDate.setDate(yesterDate.getDate() - 1);
+        let _yesterday = convertDateToUTC(yesterDate);
+
+        let _slp = 0;
+        if(_storedSlp[trimRonin] && _storedSlp[trimRonin][_yesterday] && _storedSlp[trimRonin][_yesterday]['slp']) {
+          var twoDb4 = new Date();
+          twoDb4.setDate(twoDb4.getDate() - 2);
+          let _twoDb4 = convertDateToUTC(twoDb4);
+          if(_storedSlp[trimRonin][_twoDb4] && _storedSlp[trimRonin][_twoDb4]['slp']) {
+            _2Db4Slp = _storedSlp[trimRonin][_twoDb4]['slp'];
+            _ytSlp = _2Db4Slp + _ySlp;
+          }
+        }
+
+        if(_storedSlp[trimRonin] == null) {
+          _storedSlp[trimRonin] = {};
+          if(_storedSlp[trimRonin][_yesterday] == null) {
+            _storedSlp[trimRonin][_yesterday] = {};
+          }
+        }
+
+        var now = new Date();
+        let _now = convertDateToUTC(now);
+
+        _storedSlp[trimRonin][_now]['currSlp'] = _storedSlp[trimRonin][_now]['slp'] - _ytSlp;
+        _storedSlp[trimRonin][_yesterday]['slp'] = _ytSlp;
+        _storedSlp[trimRonin][_yesterday]['currSlp'] = _ySlp;
+        window.localStorage.setItem("storedSlp", JSON.stringify(_storedSlp));
+      }
+
       $('#sName').val('');
       $('#sRonin').val('');
       $('#sPerc').val('');
+      $('#ySLP').val('');
       $('#addScholar').modal('hide');
     }
   })
@@ -123,14 +161,14 @@ jQuery(document).ready(function($) {
   setImportData('config');
   setImportData('storedSlp');
 
-  $('#isUSD').click(() => {
-    window.localStorage.setItem("storedCurrency", 'usd');
-    window.location.reload();
+  $('#isLink').click(() => {
+    $('.edit-cont').hide();
+    $('.reload-cont').show();
   })
 
-  $('#isPHP').click(() => {
-    window.localStorage.setItem("storedCurrency", 'php');
-    window.location.reload();
+  $('#isManage').click(() => {
+    $('.edit-cont').show();
+    $('.reload-cont').hide();
   })
 
   let time = new Date(Date.now()).getUTCMinutes();
@@ -330,7 +368,9 @@ function scholarDetails(data, i) {
 function displayRow(i) {
   let trimRonin = i.eth.replace("ronin:", "");
 
-  $('#detail').append(`<tr id="${trimRonin}"><td class="reload-cont"><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
+  $('#detail').append(`<tr id="${trimRonin}">
+    <td class="edit-cont" style="display: none;"><a href="#" onclick="editScholar('${trimRonin}')" class="text-primary"><span class="bi bi-pencil-square"></span></a></td>
+    <td class="reload-cont"><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
     <td><span>${i.name}</span></td>
     <td class="schoAVG"></td>
     <td class="schoToday"></td>
@@ -342,11 +382,34 @@ function displayRow(i) {
 
 function editScholar(r) {
   let _config = JSON.parse(window.localStorage.getItem("config"));
+  let _storedSlp = JSON.parse(window.localStorage.getItem("storedSlp"));
+  let _ySlp = 0;
+
   if(_config != null && _config[r]) {
+
+    if(_storedSlp) {
+      var yesterDate = new Date();
+      yesterDate.setDate(yesterDate.getDate() - 1);
+      let _yesterday = convertDateToUTC(yesterDate);
+
+      let _slp = 0;
+      if(_storedSlp[r] && _storedSlp[r][_yesterday] && _storedSlp[r][_yesterday]['slp']) {
+        _ySlp = _storedSlp[r][_yesterday]['slp'];
+
+        var twoDb4 = new Date();
+        twoDb4.setDate(twoDb4.getDate() - 2);
+        let _twoDb4 = convertDateToUTC(twoDb4);
+        if(_storedSlp[r][_twoDb4] && _storedSlp[r][_twoDb4]['slp']) {
+          _2Db4Slp = _storedSlp[r][_twoDb4]['slp'];
+          _ySlp = _ySlp - _2Db4Slp;
+        }
+      }
+    }
 
     $('#sName').val(_config[r].name);
     $('#sRonin').val(_config[r].eth);
     $('#sPerc').val(_config[r].managerShare);
+    $('#ySLP').val(_ySlp);
     $('#addScholar').modal('show');
   }
 }
@@ -558,7 +621,6 @@ function setAllData() {
       getEthPrice(currency);
       getAxsPrice(currency);
       getSlpPrice(currency, _data);
-      setCurrency(currency);
 
       $('#chartTotalSLP').html(chartTotalSLP);
       $('#totalSlp').html(`${chartTotalSLP} SLP${_getSlpPrice != null ? ('<br><small>'+ Math.floor(chartTotalSLP * _getSlpPrice['current_price'])+ ' ' +_getSlpPrice['currency'].toUpperCase()+'</small>') : ''}`);
@@ -603,16 +665,6 @@ function setOverviewData(slpPrice, totalSLP, totalRoninSLP, totalManagerSLP, tot
   $('#scholarTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/student.png"></div><div class="col col-sm-8"><span>${dollarUSLocale.format(Math.round(totalScholarSLP) * slpPrice)}</span><span><small>${Math.round(totalScholarSLP)} SLP</small></span><small>Scholar</small></div></div>`);
   $('#averageTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/chart.png"></div><div class="col col-sm-8"><span>${dollarUSLocale.format(Math.round(totalAvg/count) * slpPrice)}</span><span><small>${Math.round(totalAvg/count)} SLP</small></span><small>Average</small></div></div>`);
   $('#overAllTotal').html(`<div class="row"><div class="col col-sm-4 ovIcon"><img src="./img/coin.png"></div><div class="col col-sm-8"><span>${dollarUSLocale.format(Math.round(totalSLP+totalRoninSLP) * slpPrice)}</span><span><small>${Math.round(totalSLP+totalRoninSLP)} SLP</small></span><small>Total</small></div></div>`);
-}
-
-function setCurrency(curr) {
-  if(curr == 'usd') {
-    $('#isUSD').addClass('active');
-    $('#isPHP').removeClass('active');
-  } else {
-    $('#isUSD').removeClass('active');
-    $('#isPHP').addClass('active');
-  }
 }
 
 function exportData(id) {

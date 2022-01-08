@@ -286,6 +286,7 @@ small {
   background: #333 !important;
 }
 
+.edit-cont,
 .reload-cont {
   padding-left: 1rem !important;
   padding-right: 0px !important;
