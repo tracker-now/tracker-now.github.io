@@ -299,6 +299,10 @@ small {
 }
 
 .axie-img img {
-  width: 100px;
+  width: 90px;
   margin: -20px;
+}
+
+.brow {
+  height: 60px;
 }
