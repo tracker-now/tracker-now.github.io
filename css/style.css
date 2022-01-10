@@ -294,15 +294,19 @@ small {
 }
 
 .axie-img {
-  width: 50px;
+  width: 120px;
   padding: 0 !important;
 }
 
+.rbt {
+  border-top: unset !important;
+}
+
 .axie-img img {
-  width: 90px;
+  width: 120px;
   margin: -20px;
 }
 
 .brow {
-  height: 60px;
+  height: 80px;
 }
