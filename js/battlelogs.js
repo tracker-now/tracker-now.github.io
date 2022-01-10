@@ -8,9 +8,10 @@ $('#saveBtn').click(() => {
     let res = JSON.parse($('#sData').val());
 
     window.localStorage.setItem("sData", JSON.stringify(res));
-    loadData(res);
-
     $('#addData').modal('hide');
+
+    window.location.reload();
+    $('#loading').show();
 });
 
 function loadData(res) {
