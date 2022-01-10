@@ -287,7 +287,18 @@ small {
 }
 
 .edit-cont,
-.reload-cont {
+.reload-cont,
+.battle-cont {
   padding-left: 1rem !important;
   padding-right: 0px !important;
+}
+
+.axie-img {
+  width: 100px;
+  padding: 0 !important;
+}
+
+.axie-img img {
+  width: 100px;
+  margin: -20px;
 }

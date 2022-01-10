@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" href="img/pvp.png">
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="axie-battle-logs">
+    <link rel="apple-touch-icon" href="img/pvp.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <!-- Icon -->
+    <link rel="stylesheet" href="./css/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <title>Axie Battle logs</title>
+  </head>
+  <body class="bgdark" style="max-width: 500px;">
+    <div id="loading">
+      <img src="img/pvp.png" style="max-width: 70px" class="heart" />
+    </div>
+
+    <div class="form-group p-2">
+      <table class="table table-dark fink sortable">
+        <thead>
+          <tr>
+            <th colspan="3" scope="col">Team</th>
+            <th scope="col"></th>
+            <th colspan="3" scope="col">Opponent Team</th>
+            <th scope="col">Result</th>
+          </tr>
+        </thead>
+        <tbody id="detail">
+        </tbody>
+      </table>
+    </div>
+
+    <script src="./js/jquery-3.5.1.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/Chart.min.js"></script>
+    <script src="./js/chartjs-plugin-datalabels.js"></script>
+    <script src="./js/sortable.js"></script>
+    <script src="./js/web3.min.js"></script>
+    <script src="./js/battlelogs.js"></script>
+  </body>
+</html>
