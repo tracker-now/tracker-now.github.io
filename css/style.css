@@ -302,6 +302,15 @@ small {
   border-top: unset !important;
 }
 
+.axie-img {
+  width: 120px;
+  text-align: center;
+}
+
+.rbt {
+  border-top: unset !important;
+}
+
 .axie-img img {
   width: 120px;
   margin: -20px;
@@ -309,4 +318,115 @@ small {
 
 .brow {
   height: 80px;
+}
+
+.opponent {
+  padding: 12px;
+  text-align: center!important;
+}
+
+.abattle {
+  border: 1px solid #aaa;
+  border-top: 0;
+  padding: 15px 0;
+  color: #fff;
+  background: #333;
+  box-shadow: 1px 2px 8px 1px #575c628f;
+  padding-bottom: 7px;
+}
+
+.abattle:first-child {
+  border-top: 1px solid #aaa;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.abattle:last-child {
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.sep {
+  border-color: #aaa!important;
+  margin-bottom: 7px;
+  width: 92%;
+}
+
+body {
+  font-weight: 300;
+  font-family: "Kanit",sans-serif!important;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.cgray {
+  color: #aaa;
+  margin-left: 7px;
+  vertical-align: sub;
+}
+
+.mid, .prel {
+  position: relative;
+}
+
+.adate, .atime, .aresult, .ammr {
+  white-space: nowrap;
+  font-size: 70%;
+  position: absolute;
+}
+
+.adate {
+  top: 0;
+  left: 11px;
+}
+
+.atime {
+  top: 11px;
+  left: 17px;
+}
+
+.mid img {
+  padding: 5px 20px 0px 20px;
+}
+
+.aresult {
+  bottom: 5px;
+}
+
+.ammr {
+  bottom: 0px;
+  left: 18px;
+}
+
+.aresult.text-success {
+  left: 30px;
+}
+
+.aresult.text-danger {
+  left: 28px;
+}
+
+.asmall {
+  font-size: 70%;
+  display: block;
+}
+
+.vsub {
+  vertical-align: sub;
+}
+
+.awatch {
+  white-space: nowrap;
+  display: flex;
+  width: 52px;
+}
+
+.m6 {
+  margin: 6px;
+}
+
+.brow .axie-img {
+  padding-bottom: 18px !important;
 }

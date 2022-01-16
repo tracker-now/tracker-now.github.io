@@ -379,7 +379,7 @@ function displayRow(i) {
   $('#detail').append(`<tr id="${trimRonin}">
     <td class="edit-cont" style="display: none;"><a href="#" onclick="editScholar('${trimRonin}')" class="text-primary"><span class="bi bi-pencil-square"></span></a></td>
     <td class="reload-cont"><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
-    <td class="battle-cont" style="display: none;"><a href="http://tracker-now.free-hoster.net/?player=0x${trimRonin}" target="_blank" class="text-primary"><span class="bi bi-joystick"></span></a></td>
+    <td class="battle-cont" style="display: none;"><a href="http://tracker-now.free-hoster.net/redirect.php/?player=0x${trimRonin}" target="_blank" class="text-primary"><span class="bi bi-joystick"></span></a></td>
     <td><span>${i.name}</span></td>
     <td class="schoAVG"></td>
     <td class="schoToday"></td>
