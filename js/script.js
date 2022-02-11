@@ -480,14 +480,17 @@ function editScholar(r) {
         }
       }
     }
-    var decryptedBytes = CryptoJS.AES.decrypt(_config[r].key, "gj*d%uV@zJpiFCsG");
-    var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+    if(_config[r].key) {
+      var decryptedBytes = CryptoJS.AES.decrypt(_config[r].key, "gj*d%uV@zJpiFCsG");
+      var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
+      $('#sKey').val(_key);
+    }
 
     $('#sName').val(_config[r].name);
     $('#sRonin').val(_config[r].eth);
     $('#sPerc').val(_config[r].managerShare);
     $('#ySLP').val(_ySlp);
-    $('#sKey').val(_key);
     $('#addScholar').modal('show');
   }
 }
