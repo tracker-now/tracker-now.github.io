@@ -112,11 +112,11 @@
             <tr>
               <th scope="col"></th>
               <th scope="col">NAME</th>
+              <th scope="col">NGY</th>
               <th scope="col">AVG</th>
               <th scope="col">TDY</th>
               <th scope="col">YDA</th>
               <th scope="col">ELO</th>
-              <th scope="col">BEC</th>
               <th scope="col">LAST</th>
             </tr>
           </thead>
@@ -146,6 +146,25 @@
             <div class="form-group">
               <label for="ySLP">SLP yesterday</label>
               <input class="form-control bg-dark text-white" type="text" id="ySLP">
+            </div>
+            <div class="form-group m-0">
+              <label for="sKey">Key</label>
+              <div class="input-group">
+                <input class="form-control bg-dark text-white" type="text" id="sKey">
+                <div class="input-group-append">
+                  <span class="btn btn-primary input-group-text" id="img-qr" onclick="document.getElementById('qr-selector').click()">Img QR</span>
+                </div>
+                <div class="input-group-append">
+                  <span class="btn btn-success input-group-text" id="start-qr">Scan QR</span>
+                </div>
+                <div class="input-group-append">
+                  <span class="btn btn-danger input-group-text" id="cancel-qr" style="display: none;">Cancel Scan</span>
+                </div>
+                <input id="qr-selector" hidden type="file"/>
+              </div>
+            </div>
+            <div id="show-scan-region">
+              <video id="qr-video" hidden></video>
             </div>
             <button id="saveBtn" type="button" class="btn btn-primary float-right">Save</button>
           </div>
@@ -185,6 +204,64 @@
     <script src="./js/chartjs-plugin-datalabels.js"></script>
     <script src="./js/sortable.js"></script>
     <script src="./js/web3.min.js"></script>
+    <script src="./js/aes.js"></script>
     <script src="./js/script.js"></script>
+
+    <script type="module">
+        import QrScanner from "./js/qr-scanner.min.js";
+        QrScanner.WORKER_PATH = './js/qr-scanner-worker.min.js';
+
+        const fileQrResult = document.getElementById('file-qr-result');
+        const fileSelector = document.getElementById('qr-selector');
+        const video = document.getElementById('qr-video');
+        const imgQr = document.getElementById('img-qr');
+        const startQr = document.getElementById('start-qr');
+        const cancelQr = document.getElementById('cancel-qr');
+
+        const scanner = new QrScanner(
+          video,
+          result => {
+            $('#sKey').val(result);
+            stopScan();
+          },
+          error => {
+            $('#sKey').val(error);
+          }
+        );
+
+        function stopScan() {
+          scanner.stop();
+          $('canvas').remove();
+          $('#img-qr').show();
+          $('#start-qr').show();
+          $('#cancel-qr').hide();
+        }
+
+        cancelQr.addEventListener('click', () => {
+          stopScan();
+        });
+
+        document.getElementById('start-qr').addEventListener('click', () => {
+          scanner.start();
+          const region = document.getElementById('show-scan-region');
+          region.appendChild(scanner.$canvas);
+          scanner.$canvas.style.display = 'block';
+          scanner.$canvas.style.width = $('#show-scan-region')[0].clientWidth+'px';
+          scanner.$canvas.style.margin = '0 0 1rem 0';
+          $('#img-qr').hide();
+          $('#start-qr').hide();
+          $('#cancel-qr').show();
+        });
+
+        fileSelector.addEventListener('change', event => {
+          const file = fileSelector.files[0];
+          if (!file) {
+              return;
+          }
+          QrScanner.scanImage(file)
+              .then(result => $('#sKey').val(result))
+              .catch(e => $('#sKey').val(e));
+        });
+    </script>
   </body>
 </html>

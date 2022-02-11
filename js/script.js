@@ -39,6 +39,9 @@ jQuery(document).ready(function($) {
     for (var i in _config) {
       loadScholar(_config[i]);
       loadRoninSLP(_config[i]);
+      if(_config[i].key) {
+        loadData(_config[i], 'player-stats');
+      }
     }
     for (var i in _config) {
       schoLeaderboard(_config[i]);
@@ -56,9 +59,11 @@ jQuery(document).ready(function($) {
       }
 
       let _data = {}
+      var encryptedKey = CryptoJS.AES.encrypt($('#sKey').val(), "gj*d%uV@zJpiFCsG").toString();
       _data['name'] = $('#sName').val();
       _data['eth'] = $('#sRonin').val();
       _data['managerShare'] = $('#sPerc').val();
+      _data['key'] = encryptedKey;
 
       let trimRonin = $('#sRonin').val().replace("ronin:", "");
 
@@ -123,7 +128,7 @@ jQuery(document).ready(function($) {
         _bmc = _storedSlp[trimRonin][_now]['bmc'];
       }
       $('#'+trimRonin+' .schoMmr').html(`<span>${_data['mmr'] != undefined ? _data['mmr'] : 0}</span>`);
-      $('#'+trimRonin+' .schoWin').html(`<span>${_bmc != undefined ? _bmc : 0}</span>`);
+      // $('#'+trimRonin+' .schoWin').html(`<span>${_bmc != undefined ? _bmc : 0}</span>`);
     }
   }
 
@@ -179,13 +184,13 @@ jQuery(document).ready(function($) {
     $('.battle-cont').show();
   })
 
-  let time = new Date(Date.now()).getUTCMinutes();
-  if(time < 58) {
-    reloadWhen = 58 - time;
-    setTimeout(function () {
-      reLoad();
-    }, reloadWhen * 60000);
-  }
+  // let time = new Date(Date.now()).getUTCMinutes();
+  // if(time < 58) {
+  //   reloadWhen = 58 - time;
+  //   setTimeout(function () {
+  //     reLoad();
+  //   }, reloadWhen * 60000);
+  // }
 })
 
 function loadScholar(i) {
@@ -291,7 +296,7 @@ function setRowSLPData(_data, i, trimRonin) {
   $('#'+trimRonin+' .schoAVG').html(`<span class=${_avg <= 50 ? "b-danger" : _avg < 75 ? "b-warning" : "b-success"}>${_avg}</span>`);
   $('#'+trimRonin+' .schoToday').html(`<span class=${_currSlp <= 50 ? "b-danger" : _currSlp < 75 ? "b-warning" : "b-success"}>${_currSlp}</span>`);
   $('#'+trimRonin+' .schoYesterday').html(`<span class=${_yesterdaySlp <= 50 ? "b-danger" : _yesterdaySlp < 75 ? "b-warning" : "b-success"}>${_yesterdaySlp}</span>`);
-  $('#'+trimRonin+' .schoWin').html(`<span>${_storedSlp[trimRonin][_now]['bmc']}</span>`);
+  // $('#'+trimRonin+' .schoWin').html(`<span>${_storedSlp[trimRonin][_now]['bmc']}</span>`);
   $('#'+trimRonin+' .schoLast').html(`${_lastClaim > 1000 ? '<span>0</span>' : ('<span>'+Math.round(_lastClaim)+'</span>')+' days'}`);
   $('#'+trimRonin+' .schoNext').html(`<div class=${Math.round(_lastClaim) < 14 ? "b-warning" : "b-success"}>${_lastClaim > 1000 ? '<span>Now</span>' : (14 - Math.round(_lastClaim)) <= 0 ? '<span>Now</span>' :'In <span>'+(14 - Math.round(_lastClaim))+'</span> days'} <br><small>${_nxtClaim.toLocaleDateString().replaceAll('/','-') + ' ' + (_nxtClaim.getHours() > 12 ? (_nxtClaim.getHours() - 12) + ':' + (_nxtClaim.getMinutes() < 10 ? '0'+_nxtClaim.getMinutes() : _nxtClaim.getMinutes()) + ' PM' : _nxtClaim.getHours() + ':' + (_nxtClaim.getMinutes() < 10 ? '0'+_nxtClaim.getMinutes() : _nxtClaim.getMinutes()) + ' AM')}</small></div>`);
   $('#'+trimRonin+' .schoUnclaim').html(`<span>${dollarUSLocale.format(_unclaimed)}</span>${_getSlpPrice != null ? ('<br><small>'+ dollarUSLocale.format(_unclaimed * _getSlpPrice['current_price'])+ ' ' +_getSlpPrice['currency'].toUpperCase()+'</small>') : ''}`);
@@ -340,6 +345,56 @@ function loadRoninSLP(i) {
   });
 }
 
+function loadData(i, url) {
+  let xRonin = i.eth.replace("ronin:", "0x");
+  let trimRonin = i.eth.replace("ronin:", "");
+  var decryptedBytes = CryptoJS.AES.decrypt(i.key, "gj*d%uV@zJpiFCsG");
+  var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
+  let _now = convertDateToUTC(new Date());
+  let _cached = JSON.parse(window.localStorage.getItem(trimRonin));
+
+  if(_cached == null) _cached = {};
+  if(_cached[_now] == null) {
+    _cached[_now] = {};
+    window.localStorage.removeItem(trimRonin);
+  }
+
+  if(!(_cached[_now]['energy'] && _cached[_now]['claim'])) {
+    $.ajax({
+    url: 'https://game-api.skymavis.com/game-api/clients/'+xRonin+'/'+url,
+    type: 'GET',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer '+_key);
+    },
+    data: {},
+    success: function (data) {
+      if(url == 'player-stats') {
+        let _energy = 'XX';
+        _cached[_now]['energy'] = 0;
+        if(data.meta_data.max_energy) {
+          _energy = toDoubleDigit(data.player_stat.remaining_energy);
+          if(data.player_stat.remaining_energy == 0) {
+            _cached[_now]['energy'] = 1;
+          }
+        }
+        window.localStorage.setItem(trimRonin, JSON.stringify(_cached));
+
+        $('#'+trimRonin+' .schoNGY').html(`<span class=${_energy == 'XX' ? "b-danger" : _energy == '00' ? "b-success" : "b-warning"}>${_energy}</span>`);
+      }
+    },
+    error: function (err) {
+      if(err.responseJSON.error_type == 'INTERNAL_SERVER_ERROR') {
+        setTimeout(function () {
+          loadData(i, url);
+        }, 5000);
+      }
+    }
+    });
+  } else {
+    $('#'+trimRonin+' .schoNGY').html(`<span>Y</span>`);
+  }
+}
+
 function scholarDetails(data, i) {
   let _overAllData = JSON.parse(window.sessionStorage.getItem("overAllData"));
   let _now = convertDateToUTC(new Date());
@@ -381,11 +436,11 @@ function displayRow(i) {
     <td class="reload-cont"><a href="https://marketplace.axieinfinity.com/profile/${i.eth}/axie/" target="_blank" class="text-primary"><span class="bi bi-link-45deg"></span></a></td>
     <td class="battle-cont" style="display: none;"><a href="https://axie-now.rf.gd/redirect.php/?player=0x${trimRonin}" target="_blank" class="text-primary"><span class="bi bi-joystick"></span></a></td>
     <td><span>${i.name}</span></td>
+    <td class="schoNGY"></td>
     <td class="schoAVG"></td>
     <td class="schoToday"></td>
     <td class="schoYesterday"></td>
     <td class="schoMmr"></td>
-    <td class="schoWin"></td>
     <td class="schoLast"></td>`);
 }
 
