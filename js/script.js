@@ -113,6 +113,7 @@ jQuery(document).ready(function($) {
       $('#sRonin').val('');
       $('#sPerc').val('');
       $('#ySLP').val('');
+      $('#sKey').val('');
       $('#addScholar').modal('hide');
     }
   })
@@ -159,6 +160,13 @@ jQuery(document).ready(function($) {
       $('#sPerc').addClass('b-invalid');
     } else {
       $('#sPerc').removeClass('b-invalid');
+    }
+
+    if($('#sKey').val().length == 0) {
+      valid = false;
+      $('#sKey').addClass('b-invalid');
+    } else {
+      $('#sKey').removeClass('b-invalid');
     }
     return valid;
   }
@@ -227,6 +235,9 @@ function loadScholar(i) {
         setAllData();
         $('#loading').hide();
       }
+      setTimeout(function(){
+        loadScholar(i)
+      }, 10000);
     }
   });
 }
@@ -469,11 +480,14 @@ function editScholar(r) {
         }
       }
     }
+    var decryptedBytes = CryptoJS.AES.decrypt(_config[r].key, "gj*d%uV@zJpiFCsG");
+    var _key = decryptedBytes.toString(CryptoJS.enc.Utf8);
 
     $('#sName').val(_config[r].name);
     $('#sRonin').val(_config[r].eth);
     $('#sPerc').val(_config[r].managerShare);
     $('#ySLP').val(_ySlp);
+    $('#sKey').val(_key);
     $('#addScholar').modal('show');
   }
 }
