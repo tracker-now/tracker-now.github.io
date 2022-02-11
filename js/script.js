@@ -823,6 +823,13 @@ function isPullDown(dY, dX) {
   );
 }
 
+function toDoubleDigit(num) {
+  return num.toLocaleString('en-US', {
+    minimumIntegerDigits: 2,
+    useGrouping: false
+  })
+}
+
 document.addEventListener(
   "touchstart",
   function (e) {
