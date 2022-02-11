@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
     for (var i in _config) {
       displayRow(_config[i]);
       loadData(_config[i], 'player-stats');
-      loadData(_config[i], 'quests');
+      //loadData(_config[i], 'quests');
     }
     setTimeout(function(){ $('#loading').hide(); }, 2000);
   } else {
@@ -48,7 +48,7 @@ function editScholar(r) {
 function reloadScholar(i) {
   let _config = JSON.parse(window.localStorage.getItem("statsConf"));
   loadData(_config[i], 'player-stats');
-  loadData(_config[i], 'quests');
+  //loadData(_config[i], 'quests');
 }
 
 function loadData(i, url) {
