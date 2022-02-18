@@ -293,6 +293,10 @@ small {
   padding-right: 0px !important;
 }
 
+.edit-cont {
+  cursor: pointer;
+}
+
 .axie-img {
   width: 120px;
   padding: 0 !important;
